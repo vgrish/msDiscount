@@ -17,7 +17,7 @@ rrmdir($Model . $package . '/mysql');
 /*******************************************************/
 
 $modx->getService('error', 'error.modError');
-$modx->setLogLevel(modX::LOG_LEVEL_INFO);
+$modx->setLogLevel(modX::LOG_LEVEL_ERROR);
 $modx->setLogTarget(XPDO_CLI_MODE
 	? 'ECHO'
 	: 'HTML');
@@ -29,9 +29,16 @@ $generator = $manager->getGenerator();
 $generator->parseSchema($xml, $Model);
 $modx->addPackage($package, $Model);
 
-//$manager->removeObjectContainer('msDiscountItem');
-
-//$manager->createObjectContainer('msDiscountItem');
+$objects = array(
+	'msdSale',
+	'msdUserGroup',
+	'msdProductGroup',
+	'msdSaleMember',
+);
+foreach ($objects as $object) {
+	//$manager->removeObjectContainer($object);
+	//$manager->createObjectContainer($object);
+}
 
 print "\nDone\n";
 

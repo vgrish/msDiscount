@@ -1,7 +1,10 @@
 <?php
-
+/**
+ * @var xPDOObject $object
+ * @var array $options
+ * @var modX $modx
+  */
 if ($object->xpdo) {
-	/* @var modX $modx */
 	$modx =& $object->xpdo;
 
 	switch ($options[xPDOTransport::PACKAGE_ACTION]) {
@@ -10,7 +13,15 @@ if ($object->xpdo) {
 			$modx->addPackage('msdiscount', $modelPath);
 
 			$manager = $modx->getManager();
-			$manager->createObjectContainer('msDiscountItem');
+			$tmp = array(
+				'msdSale',
+				'msdUserGroup',
+				'msdProductGroup',
+				'msdSaleMember',
+			);
+			foreach ($tmp as $v) {
+				$manager->createObjectContainer($v);
+			}
 			break;
 
 		case xPDOTransport::ACTION_UPGRADE:

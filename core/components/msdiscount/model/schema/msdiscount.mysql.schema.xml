@@ -1,13 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model package="msdiscount" baseClass="xPDOObject" platform="mysql" defaultEngine="MyISAM" phpdoc-package="msdiscount" version="1.1">
 
-	<object class="msDiscountItem" table="msdiscount_items" extends="xPDOSimpleObject">
+	<object class="msdSale" table="ms2d_sales" extends="xPDOSimpleObject">
+		<field key="discount" dbtype="varchar" precision="10" phptype="string" null="true" default="0" />
 		<field key="name" dbtype="varchar" precision="100" phptype="string" null="false" default="" />
 		<field key="description" dbtype="text" phptype="text" null="true" default="" />
+		<field key="starts" dbtype="timestamp" phptype="sting" null="true" default="0000-00-00 00:00:00" />
+		<field key="ends" dbtype="timestamp" phptype="sting" null="true" default="0000-00-00 00:00:00" />
+		<field key="active" dbtype="tinyint" precision="1" phptype="boolean" attributes="unsigned" null="true" default="1" />
+		<field key="resource" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
+		<field key="image" dbtype="varchar" precision="255" phptype="string" null="true" default="" />
 
+		<index alias="discount" name="discount" primary="false" unique="false" type="BTREE">
+			<column key="discount" length="" collation="A" null="false" />
+		</index>
 		<index alias="name" name="name" primary="false" unique="false" type="BTREE">
 			<column key="name" length="" collation="A" null="false" />
 		</index>
+		<index alias="resource" name="resource" primary="false" unique="false" type="BTREE">
+			<column key="resource" length="" collation="A" null="false" />
+		</index>
+
+		<composite alias="Members" class="msdSaleMember" local="id" foreign="sale_id" cardinality="many" owner="local" />
+	</object>
+
+	<object class="msdUserGroup" table="ms2d_user_groups" extends="xPDOSimpleObject">
+		<field key="discount" dbtype="varchar" precision="10" phptype="string" null="true" default="0" />
+		<field key="joinsum" dbtype="decimal" precision="10,2" phptype="float" null="true" default="0" />
+
+		<index alias="joinsum" name="joinsum" primary="false" unique="false" type="BTREE" >
+			<column key="joinsum" length="" collation="A" null="false" />
+		</index>
+
+		<composite alias="Members" class="msdSaleMember" local="id" foreign="group_id" owner="local" cardinality="many">
+			<criteria target="foreign"><![CDATA[
+            {"type":"users"}
+            ]]></criteria>
+		</composite>
+	</object>
+
+	<object class="msdProductGroup" table="ms2d_product_groups" extends="xPDOSimpleObject">
+		<field key="discount" dbtype="varchar" precision="10" phptype="string" null="true" default="0" />
+
+		<composite alias="Members" class="msdSaleMember" local="id" foreign="group_id" owner="local" cardinality="many">
+			<criteria target="foreign"><![CDATA[
+            {"type":"products"}
+            ]]></criteria>
+		</composite>
+	</object>
+
+
+	<object class="msdSaleMember" table="ms2d_sale_members" extends="xPDOObject">
+		<field key="sale_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" index="pk" />
+		<field key="group_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" index="pk" />
+		<field key="type" dbtype="varchar" precision="10" phptype="string" null="false" index="pk" />
+		<field key="relation" dbtype="varchar" precision="10" phptype="varchar" null="true" default="in" />
+
+		<index alias="PRIMARY" name="PRIMARY" primary="true" unique="true">
+			<column key="sale_id" length="" collation="A" null="false" />
+			<column key="group_id" length="" collation="A" null="false" />
+			<column key="type" length="" collation="A" null="false" />
+		</index>
+
+		<index alias="relation" name="relation" primary="false" unique="false" type="BTREE" >
+			<column key="relation" length="" collation="A" null="false" />
+		</index>
+
+		<aggregate alias="Sale" class="msdSale" local="sale_id" foreign="id" cardinality="one" owner="foreign" />
 	</object>
 
 </model>
