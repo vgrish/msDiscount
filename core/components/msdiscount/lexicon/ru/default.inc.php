@@ -2,16 +2,37 @@
 
 include_once 'setting.inc.php';
 
-$_lang['msdiscount'] = 'msDiscount';
-$_lang['msdiscount_menu_desc'] = 'Пример расширения для разработки.';
-$_lang['msdiscount_items'] = 'Предметы';
-$_lang['msdiscount_item_create'] = 'Создать предмет';
-$_lang['msdiscount_item_err_ae'] = 'Предмет с таким именем уже существует.';
-$_lang['msdiscount_item_err_nf'] = 'Предмет не найден.';
-$_lang['msdiscount_item_err_ns'] = 'Предмет не указан.';
-$_lang['msdiscount_item_err_remove'] = 'Ошибка при удалении Предмета.';
-$_lang['msdiscount_item_err_save'] = 'Ошибка при сохранении Предмета.';
-$_lang['msdiscount_item_remove'] = 'Удалить Предмет';
-$_lang['msdiscount_item_remove_confirm'] = 'Вы уверены, что хотите удалить этот Предмет?';
-$_lang['msdiscount_item_update'] = 'Изменить Предмет';
-$_lang['msdiscount_intro_msg'] = 'Управляйте вашими предметами.';
+$_lang['msdiscount'] = 'Скидки и акции';
+$_lang['msdiscount_menu_desc'] = 'Управление системой скидок';
+
+$_lang['msd_sales'] = 'Скидки и акции';
+$_lang['msd_sales_desc'] = '';
+$_lang['msd_users'] = 'Группы пользователей';
+$_lang['msd_users_desc'] = '';
+$_lang['msd_products'] = 'Группы товаров';
+$_lang['msd_products_desc'] = '';
+
+
+$_lang['msd_menu_create'] = 'Создать новую запись';
+$_lang['msd_menu_update'] = 'Изменить запись';
+$_lang['msd_menu_remove'] = 'Удалить запись';
+$_lang['msd_menu_remove_confirm'] = 'Вы действительно хотите удалить эту запись?';
+
+$_lang['msd_err_ae'] = 'Это поле должно быть уникально';
+$_lang['msd_err_ns'] = 'Это поле обязательно для заполнения';
+
+$_lang['msd_sales_create'] = 'Новая скидка';
+$_lang['msd_sales_update'] = 'Редактирование ';
+$_lang['msd_sales_id'] = 'ID';
+$_lang['msd_sales_discount'] = 'Скидка';
+$_lang['msd_sales_name'] = 'Название';
+$_lang['msd_sales_description'] = 'Описание';
+$_lang['msd_sales_begins'] = 'Начинается';
+$_lang['msd_sales_ends'] = 'Заканчивается';
+$_lang['msd_sales_active'] = 'Включено';
+$_lang['msd_sales_resource'] = 'Связан со страницей';
+$_lang['msd_sales_image'] = 'Изображение';
+
+$_lang['msd_group_create'] = 'Создать группу';
+$_lang['msd_group_update'] = 'Редактирование ';
+

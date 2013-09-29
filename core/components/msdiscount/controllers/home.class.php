@@ -27,9 +27,17 @@ class msDiscountHomeManagerController extends msDiscountMainController {
 	 * @return void
 	 */
 	public function loadCustomCssJs() {
-		$this->modx->regClientStartupScript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/items.grid.js');
-		$this->modx->regClientStartupScript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/home.panel.js');
-		$this->modx->regClientStartupScript($this->msDiscount->config['jsUrl'] . 'mgr/sections/home.js');
+		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/usergroups.grid.js');
+		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/productgroups.grid.js');
+		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/sales.grid.js');
+		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/home.panel.js');
+		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/sections/home.js');
+
+		$this->addHtml('<script type="text/javascript">
+			Ext.onReady(function() {
+				MODx.load({ xtype: "msd-page-home"});
+			});
+		</script>');
 	}
 
 

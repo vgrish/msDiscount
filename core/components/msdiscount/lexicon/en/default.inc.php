@@ -2,16 +2,36 @@
 
 include_once 'setting.inc.php';
 
-$_lang['msdiscount'] = 'msDiscount';
-$_lang['msdiscount_menu_desc'] = 'A sample Extra to develop from.';
-$_lang['msdiscount_items'] = 'Items';
-$_lang['msdiscount_item_create'] = 'Create Item';
-$_lang['msdiscount_item_err_ae'] = 'An Item already exists with that name.';
-$_lang['msdiscount_item_err_nf'] = 'Item not found.';
-$_lang['msdiscount_item_err_ns'] = 'Item not specified.';
-$_lang['msdiscount_item_err_remove'] = 'An error occurred while trying to remove the Item.';
-$_lang['msdiscount_item_err_save'] = 'An error occurred while trying to save the Item.';
-$_lang['msdiscount_item_remove'] = 'Remove Item';
-$_lang['msdiscount_item_remove_confirm'] = 'Are you sure you want to remove this Item?';
-$_lang['msdiscount_item_update'] = 'Update Item';
-$_lang['msdiscount_intro_msg'] = 'Manage your items.';
+$_lang['msdiscount'] = 'Discounts';
+$_lang['msdiscount_menu_desc'] = 'Management of discount system';
+
+$_lang['msd_sales'] = 'Discounts';
+$_lang['msd_sales_desc'] = '';
+$_lang['msd_users'] = 'Users groups';
+$_lang['msd_users_desc'] = '';
+$_lang['msd_products'] = 'Products groups';
+$_lang['msd_products_desc'] = '';
+
+
+$_lang['msd_menu_create'] = 'Create new record';
+$_lang['msd_menu_update'] = 'Update record';
+$_lang['msd_menu_remove'] = 'Remove record';
+$_lang['msd_menu_remove_confirm'] = 'Are you sure you want to remove this record?';
+
+$_lang['msd_err_ae'] = 'This value must be unique';
+$_lang['msd_err_ns'] = 'This field is required';
+
+$_lang['msd_sales_create'] = 'New discount';
+$_lang['msd_sales_update'] = 'Update ';
+$_lang['msd_sales_id'] = 'ID';
+$_lang['msd_sales_discount'] = 'Discount';
+$_lang['msd_sales_name'] = 'Title';
+$_lang['msd_sales_description'] = 'Description';
+$_lang['msd_sales_begins'] = 'Begins';
+$_lang['msd_sales_ends'] = 'Ends';
+$_lang['msd_sales_active'] = 'Active';
+$_lang['msd_sales_resource'] = 'Linked with page';
+$_lang['msd_sales_image'] = 'Image';
+
+$_lang['msd_group_create'] = 'Create group';
+$_lang['msd_group_update'] = 'Update ';

@@ -1,1 +1,1 @@
-<div id="msdiscount-panel-home-div"></div>
+<div id="msd-panel-home-div"></div>

@@ -2,9 +2,9 @@
 /**
  * Get a list of Items
  */
-class msDiscountItemGetListProcessor extends modObjectGetListProcessor {
-	public $objectType = 'msDiscountItem';
-	public $classKey = 'msDiscountItem';
+class msdSalesGetListProcessor extends modObjectGetListProcessor {
+	public $objectType = 'msdSale';
+	public $classKey = 'msdSale';
 	public $defaultSortField = 'id';
 	public $defaultSortDirection = 'DESC';
 	public $renderers = '';
@@ -33,4 +33,4 @@ class msDiscountItemGetListProcessor extends modObjectGetListProcessor {
 
 }
 
-return 'msDiscountItemGetListProcessor';
+return 'msdSalesGetListProcessor';

@@ -4,6 +4,7 @@ $menus = array();
 
 $tmp = array(
 	'msdiscount' => array(
+		'parent' => 'minishop2',
 		'description' => 'msdiscount_menu_desc',
 		'action' => array(
 			'controller' => 'index',

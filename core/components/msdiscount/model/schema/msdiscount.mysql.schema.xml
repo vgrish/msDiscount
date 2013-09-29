@@ -5,7 +5,7 @@
 		<field key="discount" dbtype="varchar" precision="10" phptype="string" null="true" default="0" />
 		<field key="name" dbtype="varchar" precision="100" phptype="string" null="false" default="" />
 		<field key="description" dbtype="text" phptype="text" null="true" default="" />
-		<field key="starts" dbtype="timestamp" phptype="sting" null="true" default="0000-00-00 00:00:00" />
+		<field key="begins" dbtype="timestamp" phptype="sting" null="true" default="0000-00-00 00:00:00" />
 		<field key="ends" dbtype="timestamp" phptype="sting" null="true" default="0000-00-00 00:00:00" />
 		<field key="active" dbtype="tinyint" precision="1" phptype="boolean" attributes="unsigned" null="true" default="1" />
 		<field key="resource" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
@@ -19,6 +19,10 @@
 		</index>
 		<index alias="resource" name="resource" primary="false" unique="false" type="BTREE">
 			<column key="resource" length="" collation="A" null="false" />
+		</index>
+		<index alias="date" name="date" primary="false" unique="false" type="BTREE">
+			<column key="begins" length="" collation="A" null="false" />
+			<column key="ends" length="" collation="A" null="false" />
 		</index>
 
 		<composite alias="Members" class="msdSaleMember" local="id" foreign="sale_id" cardinality="many" owner="local" />

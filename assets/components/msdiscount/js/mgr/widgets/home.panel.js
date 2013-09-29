@@ -1,29 +1,68 @@
+msDiscount.page.Home = function(config) {
+	config = config || {};
+	Ext.applyIf(config,{
+		components: [{
+			xtype: 'msd-panel-settings'
+			,renderTo: 'msd-panel-settings-div'
+		}]
+	});
+	msDiscount.page.Home.superclass.constructor.call(this,config);
+};
+Ext.extend(msDiscount.page.Home,MODx.Component);
+Ext.reg('msd-page-home',msDiscount.page.Home);
+
 msDiscount.panel.Home = function(config) {
 	config = config || {};
 	Ext.apply(config,{
 		border: false
+		,deferredRender: true
 		,baseCls: 'modx-formpanel'
 		,items: [{
-			html: '<h2>'+_('msdiscount')+'</h2>'
+			html: '<h2>'+_('msdiscount') +'</h2>'
 			,border: false
 			,cls: 'modx-page-header container'
 		},{
 			xtype: 'modx-tabs'
-			,bodyStyle: 'padding: 10px'
+			,bodyStyle: 'padding: 5px'
 			,defaults: { border: false ,autoHeight: true }
 			,border: true
-			,activeItem: 0
 			,hideMode: 'offsets'
+			,stateful: true
+			,stateId: 'msd-settings-tabpanel'
+			,stateEvents: ['tabchange']
+			,getState:function() {return { activeTab:this.items.indexOf(this.getActiveTab())};}
 			,items: [{
-				title: _('msdiscount_items')
+				title: _('msd_sales')
+				,deferredRender: true
 				,items: [{
-					html: _('msdiscount_intro_msg')
+					html: '<p>'+_('msd_sales_desc')+'</p>'
 					,border: false
 					,bodyCssClass: 'panel-desc'
 					,bodyStyle: 'margin-bottom: 10px'
 				},{
-					xtype: 'msdiscount-grid-items'
-					,preventRender: true
+					xtype: 'msd-grid-sales'
+				}]
+			},{
+				title: _('msd_users')
+				,deferredRender: true
+				,items: [{
+					html: '<p>'+_('msd_users_desc')+'</p>'
+					,border: false
+					,bodyCssClass: 'panel-desc'
+					,bodyStyle: 'margin-bottom: 10px'
+				},{
+					xtype: 'msd-grid-users'
+				}]
+			},{
+				title: _('msd_products')
+				,deferredRender: true
+				,items: [{
+					html: '<p>'+_('msd_products_desc')+'</p>'
+					,border: false
+					,bodyCssClass: 'panel-desc'
+					,bodyStyle: 'margin-bottom: 10px'
+				},{
+					xtype: 'msd-grid-products'
 				}]
 			}]
 		}]
@@ -31,4 +70,4 @@ msDiscount.panel.Home = function(config) {
 	msDiscount.panel.Home.superclass.constructor.call(this,config);
 };
 Ext.extend(msDiscount.panel.Home,MODx.Panel);
-Ext.reg('msdiscount-panel-home',msDiscount.panel.Home);
+Ext.reg('msd-panel-home',msDiscount.panel.Home);

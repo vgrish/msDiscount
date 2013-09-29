@@ -9,7 +9,7 @@ $xpdo_meta_map['msdSale']= array (
     'discount' => '0',
     'name' => '',
     'description' => '',
-    'starts' => '0000-00-00 00:00:00',
+    'begins' => '0000-00-00 00:00:00',
     'ends' => '0000-00-00 00:00:00',
     'active' => 1,
     'resource' => 0,
@@ -40,7 +40,7 @@ $xpdo_meta_map['msdSale']= array (
       'null' => true,
       'default' => '',
     ),
-    'starts' => 
+    'begins' => 
     array (
       'dbtype' => 'timestamp',
       'phptype' => 'sting',
@@ -124,6 +124,28 @@ $xpdo_meta_map['msdSale']= array (
       'columns' => 
       array (
         'resource' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+      ),
+    ),
+    'date' => 
+    array (
+      'alias' => 'date',
+      'primary' => false,
+      'unique' => false,
+      'type' => 'BTREE',
+      'columns' => 
+      array (
+        'begins' => 
+        array (
+          'length' => '',
+          'collation' => 'A',
+          'null' => false,
+        ),
+        'ends' => 
         array (
           'length' => '',
           'collation' => 'A',
