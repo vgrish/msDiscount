@@ -195,7 +195,7 @@ msDiscount.window.UpdateSale = function(config) {
 	config = config || {};
 	this.ident = config.ident || 'mecsale'+Ext.id();
 	Ext.applyIf(config,{
-		title: _('msd_sales_update') + config.record.object['name']
+		title: _('msd_sales_update') + '"' + config.record.object['name'] + '"'
 		,id: this.ident
 		,height: 250
 		,width: 600

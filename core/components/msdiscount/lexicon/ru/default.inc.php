@@ -29,10 +29,14 @@ $_lang['msd_sales_name'] = 'Название';
 $_lang['msd_sales_description'] = 'Описание';
 $_lang['msd_sales_begins'] = 'Начинается';
 $_lang['msd_sales_ends'] = 'Заканчивается';
-$_lang['msd_sales_active'] = 'Включено';
-$_lang['msd_sales_resource'] = 'Связан со страницей';
+$_lang['msd_sales_active'] = 'Включена';
+$_lang['msd_sales_resource'] = 'Связана со страницей';
 $_lang['msd_sales_image'] = 'Изображение';
 
 $_lang['msd_group_create'] = 'Создать группу';
 $_lang['msd_group_update'] = 'Редактирование ';
+
+$_lang['msd_group_name'] = 'Название';
+$_lang['msd_group_discount'] = 'Скидка';
+$_lang['msd_group_joinsum'] = 'Требуется сумма';
 
