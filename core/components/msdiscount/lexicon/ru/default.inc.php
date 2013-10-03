@@ -21,9 +21,12 @@ $_lang['msd_menu_remove_confirm'] = 'Вы действительно хотит�
 $_lang['msd_err_ae'] = 'Это поле должно быть уникально';
 $_lang['msd_err_ns'] = 'Это поле обязательно для заполнения';
 
+$_lang['msd_sales_main'] = 'Основные свойства';
+$_lang['msd_sales_usergroups'] = 'Пользователи';
+$_lang['msd_sales_productgroups'] = 'Товары';
 $_lang['msd_sales_create'] = 'Новая скидка';
 $_lang['msd_sales_update'] = 'Редактирование ';
-$_lang['msd_sales_id'] = 'ID';
+$_lang['msd_sales_id'] = 'Id';
 $_lang['msd_sales_discount'] = 'Скидка';
 $_lang['msd_sales_name'] = 'Название';
 $_lang['msd_sales_description'] = 'Описание';
@@ -36,7 +39,11 @@ $_lang['msd_sales_image'] = 'Изображение';
 $_lang['msd_group_create'] = 'Создать группу';
 $_lang['msd_group_update'] = 'Редактирование ';
 
+$_lang['msd_group_id'] = 'Id';
 $_lang['msd_group_name'] = 'Название';
 $_lang['msd_group_discount'] = 'Скидка';
 $_lang['msd_group_joinsum'] = 'Требуется сумма';
 
+$_lang['msd_members_group'] = 'Группа';
+$_lang['msd_members_relation'] = 'Режим';
+$_lang['msd_members_select'] = 'Выберите группу';

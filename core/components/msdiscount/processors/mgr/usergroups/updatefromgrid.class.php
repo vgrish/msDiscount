@@ -1,11 +1,11 @@
 <?php
 require 'update.class.php';
 
-class msdSaleUpdateFromGridProcessor extends msdSaleUpdateProcessor {
+class msdUserGroupUpdateFromGridProcessor extends msdUserGroupUpdateProcessor {
 
 	public static function getInstance(modX &$modx,$className,$properties = array()) {
 		/** @var modProcessor $processor */
-		$processor = new msdSaleUpdateFromGridProcessor($modx,$properties);
+		$processor = new msdUserGroupUpdateFromGridProcessor($modx,$properties);
 		return $processor;
 	}
 
@@ -29,4 +29,4 @@ class msdSaleUpdateFromGridProcessor extends msdSaleUpdateProcessor {
 
 
 }
-return 'msdSaleUpdateFromGridProcessor';
+return 'msdUserGroupUpdateFromGridProcessor';

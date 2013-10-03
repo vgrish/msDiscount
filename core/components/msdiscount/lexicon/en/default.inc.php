@@ -21,6 +21,9 @@ $_lang['msd_menu_remove_confirm'] = 'Are you sure you want to remove this record
 $_lang['msd_err_ae'] = 'This value must be unique';
 $_lang['msd_err_ns'] = 'This field is required';
 
+$_lang['msd_sales_main'] = 'Main';
+$_lang['msd_sales_usergroups'] = 'Users';
+$_lang['msd_sales_productgroups'] = 'Products';
 $_lang['msd_sales_create'] = 'New discount';
 $_lang['msd_sales_update'] = 'Update ';
 $_lang['msd_sales_id'] = 'ID';

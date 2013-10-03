@@ -9,7 +9,13 @@ class msdSaleCreateProcessor extends modObjectCreateProcessor {
 
 	/** {inheritDoc} */
 	public function beforeSet() {
-		$required = array('discount','name');
+		$properties = $this->getProperties();
+		foreach ($properties as $k => & $v) {
+			$v = $this->modx->msDiscount->sanitize($k, $v);
+		}
+		$this->setProperties($properties);
+
+		$required = array('name');
 		foreach ($required as $v) {
 			if ($this->getProperty($v) == '') {
 				$this->modx->error->addField($v, $this->modx->lexicon('msd_err_ns'));
@@ -20,13 +26,6 @@ class msdSaleCreateProcessor extends modObjectCreateProcessor {
 		foreach ($unique as $v) {
 			if ($this->modx->getCount($this->classKey, array($v => $this->getProperty($v)))) {
 				$this->modx->error->addField($v, $this->modx->lexicon('msd_err_ae'));
-			}
-		}
-
-		$default = array('begins' => '0000-00-00 00:00:00', 'ends' => '0000-00-00 00:00:00');
-		foreach ($default as $k => $v) {
-			if (!$this->getProperty($k)) {
-				$this->setProperty($k, $v);
 			}
 		}
 

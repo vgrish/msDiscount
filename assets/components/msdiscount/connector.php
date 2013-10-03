@@ -6,12 +6,12 @@ require_once MODX_CONNECTORS_PATH . 'index.php';
 
 $corePath = $modx->getOption('msdiscount_core_path', null, $modx->getOption('core_path') . 'components/msdiscount/');
 require_once $corePath . 'model/msdiscount/msdiscount.class.php';
-$modx->msdiscount = new msDiscount($modx);
+$modx->msDiscount = new msDiscount($modx);
 
 $modx->lexicon->load('msdiscount:default');
 
 /* handle request */
-$path = $modx->getOption('processorsPath', $modx->msdiscount->config, $corePath . 'processors/');
+$path = $modx->getOption('processorsPath', $modx->msDiscount->config, $corePath . 'processors/');
 $modx->request->handleRequest(array(
 	'processors_path' => $path,
 	'location' => '',

@@ -6,6 +6,9 @@ msDiscount.grid.Products = function(config) {
 		,baseParams: {
 			action: 'mgr/productgroups/getlist'
 		}
+		,autosave: true
+		,save_action: 'mgr/productgroups/updatefromgrid'
+		,preventSaveRefresh: false
 		,fields: ['id','name','discount']
 		,autoHeight: true
 		,paging: true

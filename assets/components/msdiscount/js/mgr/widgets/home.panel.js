@@ -28,7 +28,7 @@ msDiscount.panel.Home = function(config) {
 			,border: true
 			,hideMode: 'offsets'
 			,stateful: true
-			,stateId: 'msd-settings-tabpanel'
+			,stateId: 'msd-panel-home'
 			,stateEvents: ['tabchange']
 			,getState:function() {return { activeTab:this.items.indexOf(this.getActiveTab())};}
 			,items: [{

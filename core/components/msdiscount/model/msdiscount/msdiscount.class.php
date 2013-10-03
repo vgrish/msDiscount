@@ -78,61 +78,35 @@ class msDiscount {
 
 
 	/**
-	 * Gets a Chunk and caches it; also falls back to file-based templates
-	 * for easier debugging.
+	 * Sanitizes values for processors
 	 *
-	 * @access public
+	 * @param $key
+	 * @param $value
 	 *
-	 * @param string $name The name of the Chunk
-	 * @param array $properties The properties for the Chunk
-	 *
-	 * @return string The processed content of the Chunk
+	 * @return mixed|string
 	 */
-	public function getChunk($name, array $properties = array()) {
-		$chunk = null;
-		if (!isset($this->chunks[$name])) {
-			$chunk = $this->modx->getObject('modChunk', array('name' => $name), true);
-			if (empty($chunk)) {
-				$chunk = $this->_getTplChunk($name, $this->config['chunkSuffix']);
-				if ($chunk == false) {
-					return false;
+	public function sanitize($key, $value) {
+		$value = trim($value);
+
+		switch (strtolower(trim($key))) {
+			case 'discount':
+				$value = preg_replace(array('/[^0-9%,\.]/','/,/'), array('', '.'), $value);
+				if (strpos($value, '%') !== false) {
+					$value = str_replace('%', '', $value) . '%';
 				}
-			}
-			$this->chunks[$name] = $chunk->getContent();
-		}
-		else {
-			$o = $this->chunks[$name];
-			$chunk = $this->modx->newObject('modChunk');
-			$chunk->setContent($o);
-		}
-		$chunk->setCacheable(false);
+				if (empty($value)) {$value = '0%';}
+				break;
 
-		return $chunk->process($properties);
+			case 'begins':
+			case 'ends':
+				if (empty($value)) {
+					$value = '0000-00-00 00:00:00';
+				}
+				break;
+		}
+
+		return $value;
 	}
 
-
-	/**
-	 * Returns a modChunk object from a template file.
-	 *
-	 * @access private
-	 *
-	 * @param string $name The name of the Chunk. Will parse to name.chunk.tpl by default.
-	 * @param string $suffix The suffix to add to the chunk filename.
-	 *
-	 * @return modChunk/boolean Returns the modChunk object if found, otherwise
-	 * false.
-	 */
-	private function _getTplChunk($name, $suffix = '.chunk.tpl') {
-		$chunk = false;
-		$f = $this->config['chunksPath'] . strtolower($name) . $suffix;
-		if (file_exists($f)) {
-			$o = file_get_contents($f);
-			$chunk = $this->modx->newObject('modChunk');
-			$chunk->set('name', $name);
-			$chunk->setContent($o);
-		}
-
-		return $chunk;
-	}
 
 }
