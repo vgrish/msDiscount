@@ -7,7 +7,7 @@ $tmp = array(
 		'file' => 'msdiscount',
 		'description' => '',
 		'events' => array(
-			'OnManagerPageInit' => array()
+			'msOnGetProductPrice' => array()
 		)
 	)
 );

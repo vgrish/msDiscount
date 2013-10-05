@@ -3,11 +3,13 @@
 $settings = array();
 
 $tmp = array(
+	/*
 	'some_setting' => array(
 		'xtype' => 'combo-boolean',
 		'value' => true,
 		'area' => 'msdiscount_main',
 	),
+	*/
 );
 
 foreach ($tmp as $k => $v) {

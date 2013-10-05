@@ -3,10 +3,12 @@
 $snippets = array();
 
 $tmp = array(
+	/*
 	'msDiscount' => array(
 		'file' => 'msdiscount',
 		'description' => '',
 	),
+	*/
 );
 
 foreach ($tmp as $k => $v) {

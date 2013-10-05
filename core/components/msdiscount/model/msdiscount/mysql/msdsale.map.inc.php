@@ -43,14 +43,14 @@ $xpdo_meta_map['msdSale']= array (
     'begins' => 
     array (
       'dbtype' => 'timestamp',
-      'phptype' => 'sting',
+      'phptype' => 'timestamp',
       'null' => true,
       'default' => '0000-00-00 00:00:00',
     ),
     'ends' => 
     array (
       'dbtype' => 'timestamp',
-      'phptype' => 'sting',
+      'phptype' => 'timestamp',
       'null' => true,
       'default' => '0000-00-00 00:00:00',
     ),

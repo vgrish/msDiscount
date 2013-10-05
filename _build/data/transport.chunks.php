@@ -3,10 +3,12 @@
 $chunks = array();
 
 $tmp = array(
+	/*
 	'tpl.msDiscount.item' => array(
 		'file' => 'item',
 		'description' => '',
 	),
+	*/
 );
 
 foreach ($tmp as $k => $v) {
