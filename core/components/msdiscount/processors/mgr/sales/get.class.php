@@ -24,14 +24,7 @@ class msdSaleGetProcessor extends modObjectGetProcessor {
 
 	/** {inheritDoc} */
 	public function cleanup() {
-		$array = $this->object->toArray();
-
-		foreach (array('begins','ends') as $v) {
-			if (isset($array[$v]) && $v == '0000-00-00 00:00:00') {
-				$array[$v] = '';
-			}
-		}
-
+		$array = $this->object->toArray('', true);
 		return $this->success('', $array);
 	}
 

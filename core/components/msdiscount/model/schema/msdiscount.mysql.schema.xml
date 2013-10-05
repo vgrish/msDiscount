@@ -5,8 +5,8 @@
 		<field key="discount" dbtype="varchar" precision="10" phptype="string" null="true" default="0" />
 		<field key="name" dbtype="varchar" precision="100" phptype="string" null="false" default="" />
 		<field key="description" dbtype="text" phptype="text" null="true" default="" />
-		<field key="begins" dbtype="timestamp" phptype="sting" null="true" default="0000-00-00 00:00:00" />
-		<field key="ends" dbtype="timestamp" phptype="sting" null="true" default="0000-00-00 00:00:00" />
+		<field key="begins" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
+		<field key="ends" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
 		<field key="active" dbtype="tinyint" precision="1" phptype="boolean" attributes="unsigned" null="true" default="1" />
 		<field key="resource" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
 		<field key="image" dbtype="varchar" precision="255" phptype="string" null="true" default="" />

@@ -317,7 +317,7 @@ msDiscount.grid.SalesMemberGroup = function(config) {
 		,pageSize: 5
 		,columns: [
 			{header: _('msd_group_name'), dataIndex: 'name', width: 100}
-			,{header: _('msd_members_relation'), dataIndex: 'relation', width: 50}
+			//,{header: _('msd_members_relation'), dataIndex: 'relation', width: 50}
 			,{header: _('msd_group_discount'), dataIndex: 'discount', width: 50}
 		]
 		,tbar: [{

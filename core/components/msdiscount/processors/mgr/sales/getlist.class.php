@@ -26,7 +26,7 @@ class msdSalesGetListProcessor extends modObjectGetListProcessor {
 	 * @return array
 	 */
 	public function prepareRow(xPDOObject $object) {
-		$array = $object->toArray();
+		$array = $object->toArray('', true);
 
 		return $array;
 	}
