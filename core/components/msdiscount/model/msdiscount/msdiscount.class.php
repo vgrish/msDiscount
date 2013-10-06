@@ -7,6 +7,13 @@ class msDiscount {
 	/* @var modX $modx */
 	public $modx;
 	public $debug = array();
+	protected $cache = array(
+		'sales' => array(),
+		'users' => array(),
+		'products' => array(),
+	);
+	protected $percent = '0%';
+	protected $absolute = 0;
 
 	/**
 	 * @param modX $modx
@@ -75,14 +82,15 @@ class msDiscount {
 	/**
 	 * Return new product price with discounts
 	 *
-	 * @param array $data
+	 * @param integer $product_id
 	 * @param float $price Current price of product
-	 * @param modUser $user
+	 * @param string $user_id
 	 * @param string $date
 	 *
-	 * @return float $price New price of product
+	 * @return bool|float|int|string
 	 */
 	public function getNewPrice($product_id, $price, $user_id = '', $date = '') {
+		$time = microtime(true);
 		if (empty($user_id)) {
 			$user_id = $this->modx->user->id;
 		}
@@ -91,87 +99,145 @@ class msDiscount {
 			return false;
 		}
 
-		$this->debugMessage('msd_dbg_initial_price', array('price' => $price));
+		$this->debugMessage('msd_dbg_initial_price', array('product_id' => $product_id, 'price' => $price));
 		$users = $this->getUserGroups($user_id);
 		$this->debugMessage('msd_dbg_get_users', array('user_id' => $user_id, 'count' => count($users)));
 		$products = $this->getProductGroups($product_id);
 		$this->debugMessage('msd_dbg_get_products', array('product_id' => $product_id, 'count' => count($products)));
+		if (empty($date)) {$date = date('Y-m-d H:i:s');}
 		$sales = $this->getSales($date);
 		$this->debugMessage('msd_dbg_get_sales', array('count' => count($sales)));
 
-		$percent = '0%';	// Discount in percent
-		$absolute = 0;		// Discount in absolute value
+		$this->percent = '0%';	// Discount in percent
+		$this->absolute = 0;	// Discount in absolute value
 
-		// Get discount by sale
-		foreach ($sales as $sale) {
-			if (empty($sale['users']) && empty($sale['products'])) {
-				$this->debugMessage('msd_dbg_sale_all', array('name' => $sale['name']));
-				$discount = $sale['discount'];
-				if (strpos($discount, '%') !== false) {
-					if ($discount > $percent) {
-						$percent = $discount;
-						$this->debugMessage('msd_dbg_sale_group', array('name' => $sale['name'], 'discount' => $discount));
+		// Get discount by sales
+		if (!empty($sales)) {
+			foreach ($sales as $sale) {
+				$this->debugMessage('msd_dbg_sale_start', array('name' => $sale['name']));
+
+				// Exclude groups if so specified in sale
+				// And convert relation to discount
+				foreach (array('users','products') as $type) {
+					foreach ($sale[$type] as $group_id => $relation) {
+						if ($relation != 'in') {
+							unset($sale[$type][$group_id]);
+							$this->debugMessage('msd_dbg_sale_'.$type.'_exclude', array('name' => $sale['name'], 'group_id' => $group_id));
+						}
+						elseif (isset(${$type}[$group_id])) {
+							$sale[$type][$group_id] = ${$type}[$group_id];
+						}
 					}
 				}
-				elseif ($discount > $absolute) {
-					$absolute = $discount;
-					$this->debugMessage('msd_dbg_sale_group', array('name' => $sale['name'], 'discount' => $discount));
+				$users_in = array_intersect(array_keys($sale['users']), array_keys($users));
+				$products_in = array_intersect(array_keys($sale['products']), array_keys($products));
+
+				if (empty($sale['users']) && empty($sale['products'])) {
+					$discount = $sale['discount'];
+					$this->debugMessage('msd_dbg_sale_all', array('name' => $sale['name']));
+					$this->discount($discount, 'msd_dbg_sale_group_both', array('name' => $sale['name'], 'discount' => $discount));
 				}
-			}
-			else {
-				foreach (array('users', 'products') as $group) {
-
-					/** @TODO сделать проверку совпадения групп юзера и товаров */
-
-					foreach ($sale[$group] as $gid) {
-						if (!isset(${$group}[$gid])) {continue;}
-						$this->debugMessage('msd_dbg_sale_group_'.$group, array('name' => $sale['name']));
-						$discount = $sale['discount'];
-						if (strpos($discount, '%') !== false) {
-							if ($discount > $percent) {
-								$percent = $discount;
-								$this->debugMessage('msd_dbg_sale_group_'.$group.'_discount', array('group_id' => $gid, 'discount' => $discount));
+				else {
+					if (!empty($sale['users']) && !empty($sale['products'])) {
+						if (!empty($users_in) && !empty($products_in)) {
+							$discount = $sale['discount'];
+							$this->debugMessage('msd_dbg_sale_group_both', array('name' => $sale['name'], 'discount' => $discount));
+							// Check group discounts
+							foreach (array('users', 'products') as $type) {
+								foreach ($sale[$type] as $group_id => $discount) {
+									$this->discount($discount, 'msd_dbg_sale_personal_'.$type, array('group_id' => $group_id, 'discount' => $discount));
+								}
 							}
 						}
-						elseif ($discount > $absolute) {
-							$absolute = $discount;
-							$this->debugMessage('msd_dbg_sale_group_'.$group.'_discount', array('group_id' => $gid, 'discount' => $discount));
+						else {
+							$this->debugMessage('msd_dbg_sale_group_no', array('name' => $sale['name']));
+							continue;
 						}
 					}
-				}
-			}
-		}
-
-		// Get discount by groups
-		foreach (array('users', 'products') as $group) {
-			foreach (${$group} as $gid => $discount) {
-				if (strpos($discount, '%') !== false) {
-					if ($discount > $percent) {
-						$percent = $discount;
-						$this->debugMessage('msd_dbg_personal_'.$group.'_discount', array('group_id' => $gid, 'discount' => $discount));
+					elseif (!empty($sale['users']) && !empty($users_in)) {
+						$discount = $sale['discount'];
+						$this->debugMessage('msd_dbg_sale_group_users', array('name' => $sale['name'], 'discount' => $discount));
+						// Check group discounts
+						foreach ($sale['users'] as $group_id => $discount) {
+							$this->discount($discount, 'msd_dbg_sale_personal_users', array('group_id' => $group_id, 'discount' => $discount));
+						}
+					}
+					elseif (!empty($sale['products']) && !empty($products_in)) {
+						$discount = $sale['discount'];
+						$this->debugMessage('msd_dbg_sale_group_products', array('name' => $sale['name'], 'discount' => $discount));
+						// Check group discounts
+						foreach ($sale['products'] as $group_id => $discount) {
+							$this->discount($discount, 'msd_dbg_sale_personal_products', array('group_id' => $group_id, 'discount' => $discount));
+						}
+					}
+					else {
+						$this->debugMessage('msd_dbg_sale_group_no', array('name' => $sale['name']));
+						continue;
 					}
 				}
-				elseif ($discount > $absolute) {
-					$absolute = $discount;
-					$this->debugMessage('msd_dbg_personal_'.$group.'_discount', array('group_id' => $gid, 'discount' => $discount));
+			}
+			$this->debugMessage('msd_dbg_sale_end');
+		}
+		else {
+			foreach (array('users', 'products') as $type) {
+				foreach (${$type} as $group_id => $discount) {
+					$this->discount($discount, 'msd_dbg_personal_'.$type, array('group_id' => $group_id, 'discount' => $discount));
 				}
 			}
 		}
 
-		if ($percent != '0%') {
-			$tmp = ($price / 100) * intval($percent);
-			$this->debugMessage('msd_dbg_discount_percent_to_abs', array('percent' => $percent, 'price' => $price, 'discount' => $tmp));
-			$percent = $tmp;
+		if ($this->percent == '0%' && $this->absolute == 0) {
+			$this->debugMessage('msd_dbg_discount_no', array('price' => $price));
 		}
-		$discount = $percent > $absolute
-			? $percent
-			: $absolute;
-		$price -= $discount;
+		else {
+			if ($this->percent != '0%') {
+				$tmp = ($price / 100) * intval($this->percent);
+				$this->debugMessage('msd_dbg_discount_percent_to_abs', array('percent' => $this->percent, 'price' => $price, 'discount' => $tmp));
+				$this->percent = $tmp;
+			}
+			else {
+				$this->percent = 0;
+			}
+			if ($this->absolute && $this->percent) {
+				$this->debugMessage('msd_dbg_discount_abs_vs_percent', array('percent' => $this->percent, 'absolute' => $this->absolute));
+			}
 
-		$this->debugMessage('msd_dbg_discount_abs_vs_percent', array('percent' => $percent, 'absolute' => $absolute, 'discount' => $discount));
-		$this->debugMessage('msd_dbg_discount_total', array('price' => $price));
+			$discount = $this->absolute > $this->percent
+				? $this->absolute
+				: $this->percent;
+			$price -= $discount;
 
+			$this->debugMessage('msd_dbg_discount_total', array('price' => $price, 'discount' => $discount));
+		}
+
+		$this->debugMessage('msd_dbg_time', array('time' => number_format(round(microtime(true) - $time, 4), 4)));
 		return $price;
+	}
+
+
+	/**
+	 * Set current discount
+	 *
+	 * @param $discount
+	 * @param string $message
+	 */
+	public function discount($discount, $message = '', $data = array()) {
+		if (strpos($discount, '%') !== false) {
+			if ($discount > $this->percent) {
+				$this->percent = $discount;
+				$this->debugMessage($message, $data);
+			}
+			else {
+				$this->debugMessage('msd_dbg_discount_less', array('discount' => $discount));
+			}
+		}
+		elseif ($discount > $this->absolute) {
+			$this->absolute = $discount;
+			$this->debugMessage($message, $data);
+		}
+		else {
+			$this->debugMessage('msd_dbg_discount_less', array('discount' => $discount));
+		}
 	}
 
 
@@ -183,21 +249,24 @@ class msDiscount {
 	 * @return array
 	 */
 	public function getUserGroups($id = 0) {
+		if (isset($this->cache['users'][$id])) {
+			return $this->cache['users'][$id];
+		}
 		$groups = array();
 
 		if (!empty($id)) {
 			$q = $this->modx->newQuery('modUserGroupMember', array('member' => $id));
 			$q->leftJoin('msdUserGroup', 'msdUserGroup', 'msdUserGroup.id = modUserGroupMember.user_group');
-			$q->select('user_group, IFNULL(`discount`, 0) as discount');
+			$q->select('user_group,discount');
+			$q->sortby('discount');
 			if ($q->prepare() && $q->stmt->execute()) {
 				while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-					//if (!empty($row['discount']) && $row['discount'] != '0%') {
-						$groups[$row['user_group']] = $row['discount'];
-					//}
+					$groups[$row['user_group']] = $row['discount'];
 				}
 			}
 		}
 
+		$this->cache['users'][$id] = $groups;
 		return $groups;
 	}
 
@@ -210,25 +279,33 @@ class msDiscount {
 	 * @return array
 	 */
 	public function getProductGroups($id) {
+		if (isset($this->cache['products'][$id])) {
+			return $this->cache['products'][$id];
+		}
 		$groups = array();
 
 		$q = $this->modx->newQuery('modResourceGroupResource', array('document' => $id));
 		$q->leftJoin('msdProductGroup', 'msdProductGroup', 'msdProductGroup.id = modResourceGroupResource.document_group');
-		$q->select('document_group, IFNULL(`discount`, 0) as discount');
-
+		$q->select('document_group,discount');
+		$q->sortby('discount');
 		if ($q->prepare() && $q->stmt->execute()) {
 			while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-				//if (!empty($row['discount']) && $row['discount'] != '0%') {
-					$groups[$row['document_group']] = $row['discount'];
-				//}
+				$groups[$row['document_group']] = $row['discount'];
 			}
 		}
 
+		$this->cache['products'][$id] = $groups;
 		return $groups;
 	}
 
 
-
+	/**
+	 * Return array with current active sales
+	 *
+	 * @param string $date
+	 *
+	 * @return array
+	 */
 	public function getSales($date = '') {
 		$groups = array();
 		if (empty($date)) {
@@ -236,6 +313,10 @@ class msDiscount {
 		}
 		elseif (is_numeric($date)) {
 			$date = date('Y-m-d H:i:s', $date);
+		}
+
+		if (isset($this->cache['sales'][$date])) {
+			return $this->cache['sales'][$date];
 		}
 
 		$q = $this->modx->newQuery('msdSale', array('active' => 1));
@@ -249,7 +330,7 @@ class msDiscount {
 			'ends:>=' => $date,
 		), '', 2);
 
-		$q->select('id,discount,name,group_id,type');
+		$q->select('id,discount,name,group_id,type,relation');
 		if ($q->prepare() && $q->stmt->execute()) {
 			while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
 				if (!empty($row['discount']) && $row['discount'] != '0%') {
@@ -263,12 +344,12 @@ class msDiscount {
 						);
 					}
 					if (!empty($row['type']) && !empty($row['group_id'])) {
-						$groups[$row['id']][$row['type']][] = $row['group_id'];
+						$groups[$row['id']][$row['type']][$row['group_id']] = $row['relation'];
 					}
 				}
 			}
 		}
-
+		$this->cache['sales'][$date] = $groups;
 		return $groups;
 	}
 
@@ -283,7 +364,6 @@ class msDiscount {
 		if ($this->config['debug']) {
 			$this->debug[] = $this->modx->lexicon($message, $data);
 		}
-
 	}
 
 
