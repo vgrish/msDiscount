@@ -20,7 +20,6 @@ switch ($modx->event->name) {
 		}
 		// Get link to product price
 		$price = & $modx->event->returnedValues['price'];
-
 		$new_price = $msDiscount->getNewPrice($data['id'], $price);
 		if ($new_price !== false) {
 			$price = $new_price;
@@ -33,13 +32,31 @@ switch ($modx->event->name) {
 		break;
 
 	case 'OnWebLogin':
-		/** Recalculate cart of user on login */
-
-		break;
-
 	case 'OnWebLogout':
-		/** Recalculate cart of user on logout */
-
+		/** Set flag for cart reload */
+		$_SESSION['minishop2']['cart_reload'] = true;
 		break;
 
+	case 'OnLoadWebDocument':
+		/**
+		 * Recalculate cart of user if flag is set
+		 * @var miniShop2 $miniShop2
+		 */
+		if (empty($_SESSION['minishop2']['cart_reload'])) {return;}
+
+		$miniShop2 = $modx->getService('miniShop2');
+		$miniShop2->initialize($modx->context->key);
+
+		$cart = $miniShop2->cart->get();
+		if (!empty($cart)) {
+			foreach ($cart as $key => $item) {
+				/** @var msProduct $product */
+				if ($product = $modx->getObject('msProductData', $item['id'])) {
+					$cart[$key]['price'] = $product->getPrice();
+				}
+			}
+			$miniShop2->cart->set($cart);
+			unset($_SESSION['minishop2']['cart_reload']);
+		}
+		break;
 }

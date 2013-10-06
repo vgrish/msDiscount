@@ -7,7 +7,10 @@ $tmp = array(
 		'file' => 'msdiscount',
 		'description' => '',
 		'events' => array(
-			'msOnGetProductPrice' => array()
+			'msOnGetProductPrice' => array(),
+			'msOnChangeOrderStatus' => array(),
+			'OnWebLogin' => array(),
+			'OnWebLogout' => array(),
 		)
 	)
 );
