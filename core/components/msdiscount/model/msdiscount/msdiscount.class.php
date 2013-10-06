@@ -33,7 +33,7 @@ class msDiscount {
 			'chunkSuffix' => '.chunk.tpl',
 			'snippetsPath' => $corePath . 'elements/snippets/',
 			'processorsPath' => $corePath . 'processors/',
-			'debug' => true,
+			'debug' => false,
 		), $config);
 
 		$this->modx->addPackage('msdiscount', $this->config['modelPath']);
@@ -91,33 +91,31 @@ class msDiscount {
 			return false;
 		}
 
-		$this->debugMessage('Начальная цена товара: "'.$price.'"');
+		$this->debugMessage('msd_dbg_initial_price', array('price' => $price));
 		$users = $this->getUserGroups($user_id);
-		$this->debugMessage('Получены группы пользователя('.$user_id.'): <b>'.count($users).'</b>');
+		$this->debugMessage('msd_dbg_get_users', array('user_id' => $user_id, 'count' => count($users)));
 		$products = $this->getProductGroups($product_id);
-		$this->debugMessage('Получены группы товара('.$product_id.'): <b>'.count($products).'</b>');
+		$this->debugMessage('msd_dbg_get_products', array('product_id' => $product_id, 'count' => count($products)));
 		$sales = $this->getSales($date);
-		$this->debugMessage('Получены активные скидки: <b>'.count($sales).'</b>');
+		$this->debugMessage('msd_dbg_get_sales', array('count' => count($sales)));
 
 		$percent = '0%';	// Discount in percent
 		$absolute = 0;		// Discount in absolute value
 
-		/** @TODO Писать отладочную инфу на английском или через лексиконы */
-
 		// Get discount by sale
 		foreach ($sales as $sale) {
 			if (empty($sale['users']) && empty($sale['products'])) {
-				$this->debugMessage("Скидка \"$sale[name]\" действует на все группы");
+				$this->debugMessage('msd_dbg_sale_all', array('name' => $sale['name']));
 				$discount = $sale['discount'];
 				if (strpos($discount, '%') !== false) {
 					if ($discount > $percent) {
 						$percent = $discount;
-						$this->debugMessage('Cкидка от группы "'.$sale['name'].'": "'.$percent.'"');
+						$this->debugMessage('msd_dbg_sale_group', array('name' => $sale['name'], 'discount' => $discount));
 					}
 				}
 				elseif ($discount > $absolute) {
 					$absolute = $discount;
-					$this->debugMessage('Cкидка от группы "'.$sale['name'].'": "'.$absolute.'"');
+					$this->debugMessage('msd_dbg_sale_group', array('name' => $sale['name'], 'discount' => $discount));
 				}
 			}
 			else {
@@ -127,17 +125,17 @@ class msDiscount {
 
 					foreach ($sale[$group] as $gid) {
 						if (!isset(${$group}[$gid])) {continue;}
-						$this->debugMessage("Скидка \"$sale[name]\" действует на группы $group");
+						$this->debugMessage('msd_dbg_sale_group_'.$group, array('name' => $sale['name']));
 						$discount = $sale['discount'];
 						if (strpos($discount, '%') !== false) {
 							if ($discount > $percent) {
 								$percent = $discount;
-								$this->debugMessage('Скидка акции для группы '.$group.'('.$gid.'): "'.$percent.'"');
+								$this->debugMessage('msd_dbg_sale_group_'.$group.'_discount', array('group_id' => $gid, 'discount' => $discount));
 							}
 						}
 						elseif ($discount > $absolute) {
 							$absolute = $discount;
-							$this->debugMessage('Скидка акции для группы '.$group.'('.$gid.'): "'.$absolute.'"');
+							$this->debugMessage('msd_dbg_sale_group_'.$group.'_discount', array('group_id' => $gid, 'discount' => $discount));
 						}
 					}
 				}
@@ -146,30 +144,23 @@ class msDiscount {
 
 		// Get discount by groups
 		foreach (array('users', 'products') as $group) {
-			foreach (${$group} as $id => $discount) {
+			foreach (${$group} as $gid => $discount) {
 				if (strpos($discount, '%') !== false) {
 					if ($discount > $percent) {
 						$percent = $discount;
-						$this->debugMessage('Персональная скидка группы '.$group.'('.$id.'): "'.$percent.'"');
+						$this->debugMessage('msd_dbg_personal_'.$group.'_discount', array('group_id' => $gid, 'discount' => $discount));
 					}
 				}
 				elseif ($discount > $absolute) {
 					$absolute = $discount;
-					$this->debugMessage('Персональная скидка группы '.$group.'('.$id.'): "'.$absolute.'"');
+					$this->debugMessage('msd_dbg_personal_'.$group.'_discount', array('group_id' => $gid, 'discount' => $discount));
 				}
 			}
 		}
 
-		/*
-			var_dump($price, $users, $products, $sales);
-			echo '<br/><br/>';
-			var_dump($percent, $absolute);
-		*/
-
-
 		if ($percent != '0%') {
 			$tmp = ($price / 100) * intval($percent);
-			$this->debugMessage('Считаем процент "'.$percent.'" от цены товара "'.$price.'" - выходит "'.$tmp.'"');
+			$this->debugMessage('msd_dbg_discount_percent_to_abs', array('percent' => $percent, 'price' => $price, 'discount' => $tmp));
 			$percent = $tmp;
 		}
 		$discount = $percent > $absolute
@@ -177,10 +168,8 @@ class msDiscount {
 			: $absolute;
 		$price -= $discount;
 
-		$this->debugMessage('Сравниваем абсолютную скидку "'.$absolute.'" с посчитанным процентом "'.$percent.'" и выбираем большую: "'.$discount.'"');
-		$this->debugMessage('Итоговая стоимость товара "'.$price.'"');
-
-		//echo '<pre>';print_r($this->debug);die;
+		$this->debugMessage('msd_dbg_discount_abs_vs_percent', array('percent' => $percent, 'absolute' => $absolute, 'discount' => $discount));
+		$this->debugMessage('msd_dbg_discount_total', array('price' => $price));
 
 		return $price;
 	}
@@ -284,9 +273,17 @@ class msDiscount {
 	}
 
 
+	/**
+	 * Adds debug messages
+	 *
+	 * @param $message
+	 * @param array $data
+	 */
+	public function debugMessage($message, $data = array()) {
+		if ($this->config['debug']) {
+			$this->debug[] = $this->modx->lexicon($message, $data);
+		}
 
-	public function debugMessage($message) {
-		$this->debug[] = $message;
 	}
 
 
