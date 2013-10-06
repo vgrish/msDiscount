@@ -115,7 +115,6 @@ class msDiscount {
 		if (!empty($sales)) {
 			foreach ($sales as $sale) {
 				$this->debugMessage('msd_dbg_sale_start', array('name' => $sale['name']));
-
 				// Exclude groups if so specified in sale
 				// And convert relation to discount
 				foreach (array('users','products') as $type) {
@@ -136,6 +135,12 @@ class msDiscount {
 					$discount = $sale['discount'];
 					$this->debugMessage('msd_dbg_sale_all', array('name' => $sale['name']));
 					$this->discount($discount, 'msd_dbg_sale_group_both', array('name' => $sale['name'], 'discount' => $discount));
+					// Check group discount
+					foreach (array('users', 'products') as $type) {
+						foreach (${$type} as $group_id => $discount) {
+							$this->discount($discount, 'msd_dbg_sale_personal_'.$type, array('group_id' => $group_id, 'discount' => $discount));
+						}
+					}
 				}
 				else {
 					if (!empty($sale['users']) && !empty($sale['products'])) {
@@ -179,6 +184,7 @@ class msDiscount {
 			$this->debugMessage('msd_dbg_sale_end');
 		}
 		else {
+			// Check group discounts
 			foreach (array('users', 'products') as $type) {
 				foreach (${$type} as $group_id => $discount) {
 					$this->discount($discount, 'msd_dbg_personal_'.$type, array('group_id' => $group_id, 'discount' => $discount));
