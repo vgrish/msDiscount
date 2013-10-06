@@ -146,7 +146,7 @@ class msDiscount {
 					if (!empty($sale['users']) && !empty($sale['products'])) {
 						if (!empty($users_in) && !empty($products_in)) {
 							$discount = $sale['discount'];
-							$this->debugMessage('msd_dbg_sale_group_both', array('name' => $sale['name'], 'discount' => $discount));
+							$this->discount($discount, 'msd_dbg_sale_group_both', array('name' => $sale['name'], 'discount' => $discount));
 							// Check group discounts
 							foreach (array('users', 'products') as $type) {
 								foreach ($sale[$type] as $group_id => $discount) {
@@ -161,7 +161,7 @@ class msDiscount {
 					}
 					elseif (!empty($sale['users']) && !empty($users_in)) {
 						$discount = $sale['discount'];
-						$this->debugMessage('msd_dbg_sale_group_users', array('name' => $sale['name'], 'discount' => $discount));
+						$this->discount($discount, 'msd_dbg_sale_group_users', array('name' => $sale['name'], 'discount' => $discount));
 						// Check group discounts
 						foreach ($sale['users'] as $group_id => $discount) {
 							$this->discount($discount, 'msd_dbg_sale_personal_users', array('group_id' => $group_id, 'discount' => $discount));
@@ -169,7 +169,7 @@ class msDiscount {
 					}
 					elseif (!empty($sale['products']) && !empty($products_in)) {
 						$discount = $sale['discount'];
-						$this->debugMessage('msd_dbg_sale_group_products', array('name' => $sale['name'], 'discount' => $discount));
+						$this->discount($discount, 'msd_dbg_sale_group_products', array('name' => $sale['name'], 'discount' => $discount));
 						// Check group discounts
 						foreach ($sale['products'] as $group_id => $discount) {
 							$this->discount($discount, 'msd_dbg_sale_personal_products', array('group_id' => $group_id, 'discount' => $discount));
@@ -233,7 +233,7 @@ class msDiscount {
 				$this->percent = $discount;
 				$this->debugMessage($message, $data);
 			}
-			else {
+			elseif ($discount != '0%') {
 				$this->debugMessage('msd_dbg_discount_less', array('discount' => $discount));
 			}
 		}
