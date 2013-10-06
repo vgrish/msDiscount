@@ -8,7 +8,7 @@ msDiscount.grid.Sales = function(config) {
 		}
 		,autosave: true
 		,save_action: 'mgr/sales/updatefromgrid'
-		,preventSaveRefresh: false
+		//,preventSaveRefresh: false
 		,fields: ['id','discount','name','description','begins','ends','active','image']
 		,autoHeight: true
 		,paging: true
@@ -310,14 +310,16 @@ msDiscount.grid.SalesMemberGroup = function(config) {
 			,type: config.type
 			,sale_id: config.record.id
 		}
-		,fields: ['sale_id','group_id','group','relation','name','discount']
+		,autosave: true
+		,save_action: 'mgr/sales/members/updatefromgrid'
+		,fields: ['sale_id','group_id','type','relation','name','discount']
 		,autoHeight: true
 		,paging: true
 		,remoteSort: true
 		,pageSize: 5
 		,columns: [
 			{header: _('msd_group_name'), dataIndex: 'name', width: 100}
-			//,{header: _('msd_members_relation'), dataIndex: 'relation', width: 50}
+			,{header: _('msd_members_relation'), dataIndex: 'relation', width: 50, renderer: this.renderRelation, editor: {xtype: 'msd-combo-relation'}}
 			,{header: _('msd_group_discount'), dataIndex: 'discount', width: 50}
 		]
 		,tbar: [{
@@ -342,6 +344,18 @@ Ext.extend(msDiscount.grid.SalesMemberGroup,MODx.grid.Grid, {
 			,handler: this.removeGroup
 		});
 		this.addContextMenuItem(m);
+	}
+
+	,renderRelation: function(value) {
+		if (value == 'in') {
+			return '<span style="color:green;">'+ _('msd_members_relation_in') + '</span>';
+		}
+		else if (value == 'out') {
+			return '<span style="color:red;">'+ _('msd_members_relation_out') + '</span>';
+		}
+		else {
+			return value;
+		}
 	}
 
 	,addGroup: function(combo, row) {

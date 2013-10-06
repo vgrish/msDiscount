@@ -64,6 +64,17 @@ msDiscount.panel.Home = function(config) {
 				},{
 					xtype: 'msd-grid-products'
 				}]
+			},{
+				title: _('msd_check')
+				,deferredRender: true
+				,items: [{
+					html: '<p>'+_('msd_check_desc')+'</p>'
+					,border: false
+					,bodyCssClass: 'panel-desc'
+					,bodyStyle: 'margin-bottom: 10px'
+				},{
+					xtype: 'msd-form-check'
+				}]
 			}]
 		}]
 	});

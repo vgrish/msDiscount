@@ -8,7 +8,7 @@ msDiscount.grid.Users = function(config) {
 		}
 		,autosave: true
 		,save_action: 'mgr/usergroups/updatefromgrid'
-		,preventSaveRefresh: false
+		//,preventSaveRefresh: false
 		,fields: ['id','name','discount','joinsum']
 		,autoHeight: true
 		,paging: true
