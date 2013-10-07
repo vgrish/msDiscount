@@ -67,7 +67,9 @@ class msDiscount {
 				}
 				if (empty($value)) {$value = '0%';}
 				break;
-
+			case 'joinsum':
+				if (empty($value)) {$value = 0;}
+				break;
 			case 'begins':
 			case 'ends':
 				if (empty($value)) {
