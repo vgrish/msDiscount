@@ -20,15 +20,40 @@ switch ($modx->event->name) {
 		}
 		// Get link to product price
 		$price = & $modx->event->returnedValues['price'];
-		$new_price = $msDiscount->getNewPrice($data['id'], $price);
+		$new_price = $msDiscount->getNewPrice($product->id, $price);
 		if ($new_price !== false) {
 			$price = $new_price;
 		}
 		break;
 
 	case 'msOnChangeOrderStatus':
-		/** Add user to discounts group if they spent required sum for join */
+		/**
+		 * Add user to discounts group if he spent required sum for join
+		 *
+		 * @var msOrder $order
+		 * @var integer $status
+		 */
+		if ($status != 2) {return;}
 
+		/** @var modUser $user */
+		if ($user = $order->getOne('User')) {
+			if ($profile = $modx->getObject('msCustomerProfile', $user->id)) {
+				$spent = $profile->spent;
+				if ($spent > 0) {
+					$q = $modx->newQuery('msdUserGroup');
+					$q->where('joinsum > 0');
+					$q->select('id,joinsum');
+					if ($q->prepare() && $q->stmt->execute()) {
+						$groups = $msDiscount->getUserGroups($user->id);
+						while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+							if ($spent > $row['joinsum'] && !isset($groups[$row['id']])) {
+								$user->joinGroup((integer) $row['id'], 1);
+							}
+						}
+					}
+				}
+			}
+		}
 		break;
 
 	case 'OnWebLogin':
@@ -56,7 +81,7 @@ switch ($modx->event->name) {
 				}
 			}
 			$miniShop2->cart->set($cart);
-			unset($_SESSION['minishop2']['cart_reload']);
 		}
+		unset($_SESSION['minishop2']['cart_reload']);
 		break;
 }

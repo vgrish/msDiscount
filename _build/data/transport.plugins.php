@@ -8,7 +8,7 @@ $tmp = array(
 		'description' => '',
 		'events' => array(
 			'msOnGetProductPrice' => array(),
-			'msOnChangeOrderStatus' => array(),
+			'msOnChangeOrderStatus' => array('priority' => 10),
 			'OnWebLogin' => array(),
 			'OnWebLogout' => array(),
 		)
