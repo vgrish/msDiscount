@@ -1,10 +1,10 @@
 --------------------
 msDiscount
 --------------------
-Author: John Doe <john@doe.com>
+Author: Vasiliy Naumkin <bezumkin@yandex.ru>
 --------------------
 
-A basic Extra for MODx Revolution.
+Discount system for miniShop2.
 
 Feel free to suggest ideas/improvements/bugs on GitHub:
-http://github.com/username/msDiscount/issues
+http://github.com/bezumkin/msDiscount/issues
