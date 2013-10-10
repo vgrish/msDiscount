@@ -97,8 +97,8 @@ class msDiscount {
 			$user_id = $this->modx->user->id;
 		}
 
-		if (empty($user_id) || empty($product_id)) {
-			return false;
+		if ($user_id === '' || empty($product_id)) {
+			return $price;
 		}
 
 		$this->debugMessage('msd_dbg_initial_price', array('product_id' => $product_id, 'price' => $price));
