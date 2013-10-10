@@ -117,19 +117,25 @@ class msDiscount {
 		if (!empty($sales)) {
 			foreach ($sales as $sale) {
 				$this->debugMessage('msd_dbg_sale_start', array('name' => $sale['name']));
+				$exclude = false;
 				// Exclude groups if so specified in sale
 				// And convert relation to discount
 				foreach (array('users','products') as $type) {
 					foreach ($sale[$type] as $group_id => $relation) {
 						if ($relation != 'in') {
 							unset($sale[$type][$group_id]);
-							$this->debugMessage('msd_dbg_sale_'.$type.'_exclude', array('name' => $sale['name'], 'group_id' => $group_id));
+							if (isset(${$type}[$group_id])) {
+								$this->debugMessage('msd_dbg_sale_'.$type.'_exclude', array('name' => $sale['name'], 'group_id' => $group_id));
+								$exclude = true;
+								break(2);
+							}
 						}
 						elseif (isset(${$type}[$group_id])) {
 							$sale[$type][$group_id] = ${$type}[$group_id];
 						}
 					}
 				}
+				if ($exclude) {continue;}
 				$users_in = array_intersect(array_keys($sale['users']), array_keys($users));
 				$products_in = array_intersect(array_keys($sale['products']), array_keys($products));
 
@@ -341,19 +347,17 @@ class msDiscount {
 		$q->select('id,discount,name,group_id,type,relation');
 		if ($q->prepare() && $q->stmt->execute()) {
 			while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-				if (!empty($row['discount']) && $row['discount'] != '0%') {
-					if (!isset($groups[$row['id']])) {
-						$groups[$row['id']] = array(
-							'id' => $row['id'],
-							'discount' => $row['discount'],
-							'name' => $row['name'],
-							'users' => array(),
-							'products' => array(),
-						);
-					}
-					if (!empty($row['type']) && !empty($row['group_id'])) {
-						$groups[$row['id']][$row['type']][$row['group_id']] = $row['relation'];
-					}
+				if (!isset($groups[$row['id']])) {
+					$groups[$row['id']] = array(
+						'id' => $row['id'],
+						'discount' => $row['discount'],
+						'name' => $row['name'],
+						'users' => array(),
+						'products' => array(),
+					);
+				}
+				if (!empty($row['type']) && !empty($row['group_id'])) {
+					$groups[$row['id']][$row['type']][$row['group_id']] = $row['relation'];
 				}
 			}
 		}
