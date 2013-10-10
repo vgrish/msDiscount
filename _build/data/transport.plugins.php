@@ -11,6 +11,7 @@ $tmp = array(
 			'msOnChangeOrderStatus' => array('priority' => 10),
 			'OnWebLogin' => array(),
 			'OnWebLogout' => array(),
+			'OnLoadWebDocument' => array(),
 		)
 	)
 );
