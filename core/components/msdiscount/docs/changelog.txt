@@ -1,5 +1,9 @@
 Changelog for msDiscount.
 
+1.0.0-pl
+==============
+- Improved install script.
+
 1.0.0-beta
 ==============
 - Initial release.

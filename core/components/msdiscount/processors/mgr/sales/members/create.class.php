@@ -9,8 +9,14 @@ class msdSaleMemberCreateProcessor extends modObjectCreateProcessor {
 
 	/** {inheritDoc} */
 	public function beforeSet() {
-		$this->object->fromArray($this->getProperties(), '', true, true);
+		$required = array('sale_id','group_id','type');
+		foreach ($required as $v) {
+			if ($this->getProperty($v) == '') {
+				$this->modx->error->addField($v, $this->modx->lexicon('msd_err_ns'));
+			}
+		}
 
+		$this->object->fromArray($this->getProperties(), '', true, true);
 		return parent::beforeSet();
 	}
 

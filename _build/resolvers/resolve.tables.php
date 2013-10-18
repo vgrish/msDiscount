@@ -22,6 +22,32 @@ if ($object->xpdo) {
 			foreach ($tmp as $v) {
 				$manager->createObjectContainer($v);
 			}
+
+			$groups = $modx->getCollection('modUserGroup');
+			foreach ($groups as $group) {
+				if (!$modx->getCount('msdUserGroup', $group->id)) {
+					$new = $modx->newObject('msdUserGroup');
+					$new->fromArray(array(
+						'id' => $group->id,
+						'discount' => '0%',
+						'joinsum' => 0
+					), '', true, true);
+					$new->save();
+				}
+			}
+
+			$groups = $modx->getCollection('modResourceGroup');
+			foreach ($groups as $group) {
+				if (!$modx->getCount('msdProductGroup', $group->id)) {
+					$new = $modx->newObject('msdProductGroup');
+					$new->fromArray(array(
+						'id' => $group->id,
+						'discount' => '0%',
+					), '', true, true);
+					$new->save();
+				}
+			}
+
 			break;
 
 		case xPDOTransport::ACTION_UPGRADE:
