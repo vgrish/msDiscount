@@ -237,7 +237,7 @@ class msDiscount {
 	 */
 	public function discount($discount, $message = '', $data = array()) {
 		if (strpos($discount, '%') !== false) {
-			if ($discount > $this->percent) {
+			if ((float) ($discount) > (float) $this->percent) {
 				$this->percent = $discount;
 				$this->debugMessage($message, $data);
 			}
@@ -245,7 +245,7 @@ class msDiscount {
 				$this->debugMessage('msd_dbg_discount_less', array('discount' => $discount));
 			}
 		}
-		elseif ($discount > $this->absolute) {
+		elseif ((float) $discount > (float) $this->absolute) {
 			$this->absolute = $discount;
 			$this->debugMessage($message, $data);
 		}
