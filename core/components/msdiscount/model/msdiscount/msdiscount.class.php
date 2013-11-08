@@ -234,6 +234,7 @@ class msDiscount {
 	 *
 	 * @param $discount
 	 * @param string $message
+	 * @param array $data
 	 */
 	public function discount($discount, $message = '', $data = array()) {
 		if (strpos($discount, '%') !== false) {
