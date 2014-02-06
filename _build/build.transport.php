@@ -7,6 +7,10 @@ $tstart = $mtime;
 set_time_limit(0);
 
 require_once 'build.config.php';
+// Refresh model
+if (file_exists('build.model.php')) {
+	require_once 'build.model.php';
+}
 
 /* define sources */
 $root = dirname(dirname(__FILE__)).'/';
@@ -271,8 +275,8 @@ $tend= $mtime;
 $totalTime= ($tend - $tstart);
 $totalTime= sprintf("%2.4f s", $totalTime);
 
+$signature = $builder->getSignature();
 if (defined('PKG_AUTO_INSTALL') && PKG_AUTO_INSTALL) {
-	$signature = $builder->getSignature();
 	$sig = explode('-',$signature);
 	$versionSignature = explode('.',$sig[1]);
 
@@ -307,6 +311,9 @@ if (defined('PKG_AUTO_INSTALL') && PKG_AUTO_INSTALL) {
 	if ($package->install()) {
 		$modx->runProcessor('system/clearcache');
 	}
+}
+if (!empty($_GET['download'])) {
+	echo '<script>document.location.href = "/core/packages/' . $signature.'.transport.zip' . '";</script>';
 }
 
 $modx->log(modX::LOG_LEVEL_INFO,"\n<br />Execution time: {$totalTime}\n");
