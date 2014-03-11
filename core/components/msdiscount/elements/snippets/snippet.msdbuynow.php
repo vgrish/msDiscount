@@ -1,6 +1,4 @@
 <?php
-$sale = '1,2';
-
 $msDiscount = $modx->getService('msDiscount');
 
 $q = $modx->newQuery('modUserGroupMember', array('member' => $modx->user->id));
