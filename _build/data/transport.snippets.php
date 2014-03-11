@@ -9,6 +9,12 @@ $tmp = array(
 		'description' => '',
 	),
 	*/
+
+	'msdBuyNow' => array(
+		'file' => 'msdbuynow',
+		'description' => '',
+	),
+
 );
 
 foreach ($tmp as $k => $v) {
