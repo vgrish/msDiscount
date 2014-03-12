@@ -5,7 +5,7 @@ $properties = array();
 $tmp = array(
     'tpl' => array(
     	'type' => 'textfield',
-		'value' => 'tpl.msProducts.row',
+		'value' => 'tpl.msProducts.discount.row',
 	),
 	'limit' => array(
 		'type' => 'numberfield',
