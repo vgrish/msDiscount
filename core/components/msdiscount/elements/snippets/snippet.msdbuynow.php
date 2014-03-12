@@ -9,6 +9,7 @@ if (empty($outputSeparator)) $outputSeparator = "\n";
 
 $miniShop2 = $modx->getService('miniShop2');
 $msDiscount = $modx->getService('msDiscount');
+$modx->regClientScript($modx->getOption('assets_url').'components/msdiscount/js/web/default.js');
 
 $q = $modx->newQuery('modUserGroupMember', array('member' => $modx->user->id));
 $q->select('user_group');

@@ -44,10 +44,10 @@ class msdSaleGroupGetListProcessor extends modObjectGetListProcessor {
 				'msdSaleMember.sale_id' => $this->getProperty('sale_id'),
 			)
 		);
-		$c->select($this->modx->getSelectColumns($this->linkedKey, $this->linkedKey));
-    	$c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
-		$c->where(array('msdSaleMember.sale_id' => null));
-		return $c;
+        $c->select($this->modx->getSelectColumns($this->linkedKey, $this->linkedKey));
+        $c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
+        $c->where(array('msdSaleMember.sale_id' => null));
+        return $c;
 	}
 
 
