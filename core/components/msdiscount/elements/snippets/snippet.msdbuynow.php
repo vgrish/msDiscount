@@ -7,6 +7,7 @@ if (empty($sortdir)) $sortdir = "ASC";
 if (empty($showHidden)) $showHidden = true;
 if (empty($outputSeparator)) $outputSeparator = "\n";
 
+$miniShop2 = $modx->getService('miniShop2');
 $msDiscount = $modx->getService('msDiscount');
 
 $q = $modx->newQuery('modUserGroupMember', array('member' => $modx->user->id));
@@ -23,8 +24,15 @@ if (!empty($sale)) {
     $q->where(array('`msdSale`.`id`:IN' => explode(',', $sale)));
 }
 $q->where(array(
-      'now() between `msdSale`.`begins` and `msdSale`.`ends`'
+    'now() between `msdSale`.`begins` and `msdSale`.`ends`'
 ));
+if (!empty($where)) {
+    $tmp = array();
+    foreach ($modx->fromJSON($where) as $key => $val) {
+        $tmp['`modResource`.`'.$key.'`'] = $val;
+    }
+    $q->where($tmp);
+}
 $q->select(array('`modResourceGroupResource`.`document`','`msdSaleUserGroups`.`group_id`','`msdSale`.`active`', '`modResourceGroup`.`id` AS `group_id`'));
 $q->select(array('`msdSale`.`id` AS `sale_id`, `msdSale`.`discount` AS `sale_discount`, `msdSale`.`name` AS `sale_name`,
     `msdSale`.`description` AS `sale_description`, `msdSale`.`begins` AS `sale_begins`, `msdSale`.`ends` AS `sale_ends`,
@@ -42,7 +50,11 @@ $q->leftJoin('msVendor','Vendor', array('`Vendor`.`id` = `Data`.`vendor`'));
 $q->sortby("`modResource`.`$sortby`", $sortdir);
 $q->limit($limit,$offset);
 $q->sortby('MAX(`msdSale`.`discount`)', 'DESC');
-$q->groupby('`modResourceGroupResource`.`document` HAVING (`msdSaleUserGroups`.`group_id` IS NULL OR `msdSaleUserGroups`.`group_id` IN ('.implode(',', $groups).')) AND `msdSale`.`active` = 1');
+if ($groups) {
+    $q->groupby('`modResourceGroupResource`.`document` HAVING (`msdSaleUserGroups`.`group_id` IS NULL OR `msdSaleUserGroups`.`group_id` IN ('.implode(',', $groups).')) AND `msdSale`.`active` = 1');
+} else {
+    $q->groupby('`modResourceGroupResource`.`document` HAVING `msdSaleUserGroups`.`group_id` IS NULL AND `msdSale`.`active` = 1');
+}
 
 $output = array();
 if ($q->prepare() && $q->stmt->execute()) {
