@@ -1,4 +1,12 @@
 <?php
+if (empty($tpl)) $tpl = "tpl.msProducts.row";
+if (empty($limit)) $limit = 10;
+if (empty($offset)) $offset = 0;
+if (empty($sortby)) $sortby = "id";
+if (empty($sortdir)) $sortdir = "ASC";
+if (empty($showHidden)) $showHidden = true;
+if (empty($outputSeparator)) $outputSeparator = "\n";
+
 $msDiscount = $modx->getService('msDiscount');
 
 $q = $modx->newQuery('modUserGroupMember', array('member' => $modx->user->id));
@@ -14,7 +22,6 @@ $q = $modx->newQuery('msdSale');
 if (!empty($sale)) {
     $q->where(array('`msdSale`.`id`:IN' => explode(',', $sale)));
 }
-
 $q->where(array(
       'now() between `msdSale`.`begins` and `msdSale`.`ends`'
 ));
@@ -32,10 +39,16 @@ $q->rightJoin('modResourceGroupResource','modResourceGroupResource', array('`mod
 $q->leftJoin('modResource','modResource', array('`modResource`.`id` = `modResourceGroupResource`.`document`'));
 $q->leftJoin('msProductData','Data', array('`modResource`.`id` = `Data`.`id`'));
 $q->leftJoin('msVendor','Vendor', array('`Vendor`.`id` = `Data`.`vendor`'));
-
+$q->sortby("`modResource`.`$sortby`", $sortdir);
+$q->limit($limit,$offset);
+$q->sortby('MAX(`msdSale`.`discount`)', 'DESC');
 $q->groupby('`modResourceGroupResource`.`document` HAVING (`msdSaleUserGroups`.`group_id` IS NULL OR `msdSaleUserGroups`.`group_id` IN ('.implode(',', $groups).')) AND `msdSale`.`active` = 1');
+
 $output = array();
 if ($q->prepare() && $q->stmt->execute()) {
+    if (!$modx->getObject('modChunk', array('name' => $tpl))) {
+        $outType = 'array';
+    }
 	while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
         if ($row['old_price'] == 0) {
 	        $row['old_price'] = $row['price'];
@@ -45,8 +58,19 @@ if ($q->prepare() && $q->stmt->execute()) {
 	    } else {
 	        $row['price'] = $row['price'] - $row['sale_discount'];
 	    }
-		$output[] = $modx->getChunk($tpl, $row);
+        $row['remains'] = strtotime($row['sale_ends']) - time();
+		if ($outType == 'array') {
+    	   $output[] = $row;
+		} else {
+            $output[] = $modx->getChunk($tpl, $row);
+		}
 	}
 }
 
-return implode($outputSeparator, $output);
+if ($outType == 'array') {
+    print "<pre>";
+    print_r($output);
+    print "</pre>";
+} else {
+    return implode($outputSeparator, $output);
+}
