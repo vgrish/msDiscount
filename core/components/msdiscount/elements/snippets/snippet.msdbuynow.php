@@ -9,6 +9,14 @@ if (empty($outputSeparator)) $outputSeparator = "\n";
 
 $miniShop2 = $modx->getService('miniShop2');
 $msDiscount = $modx->getService('msDiscount');
+$modx->regClientCSS($modx->getOption('assets_url').'components/msdiscount/css/web/main.css');
+/*$modx->regClientScript(preg_replace(array('/^\n/', '/\t{7}/'), '', '
+<script type="text/javascript">
+	if(typeof jQuery == "undefined") {
+		document.write("<script src=\"'.$modx->getOption('assets_url').'components/msdiscount/js/web/lib/jquery.min.js\" type=\"text/javascript\"><\/script>");
+	}
+</script>
+	'), true);*/
 $modx->regClientScript($modx->getOption('assets_url').'components/msdiscount/js/web/default.js');
 
 $q = $modx->newQuery('modUserGroupMember', array('member' => $modx->user->id));
