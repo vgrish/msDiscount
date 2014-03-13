@@ -65,6 +65,9 @@ if ($groups) {
     $q->groupby('`modResourceGroupResource`.`document` HAVING `msdSaleUserGroups`.`group_id` IS NULL AND `msdSale`.`active` = 1');
 }
 
+$timezone = $modx->getOption('date_timezone');
+if (!$timezone) $timezone = 'Europe/Moscow';
+date_default_timezone_set($timezone);
 $output = array();
 if ($q->prepare() && $q->stmt->execute()) {
     if (!$modx->getObject('modChunk', array('name' => $tpl))) {
