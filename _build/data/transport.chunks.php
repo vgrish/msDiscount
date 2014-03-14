@@ -9,6 +9,10 @@ $tmp = array(
 		'description' => '',
 	),
 	*/
+    'tpl.msProducts.discount.row' => array(
+		'file' => 'msd_product_row',
+		'description' => '',
+	),
 );
 
 foreach ($tmp as $k => $v) {
