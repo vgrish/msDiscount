@@ -1,5 +1,9 @@
 Changelog for msDiscount.
 
+1.0.2-pl
+==============
+- Added Buy Now snippet.
+
 1.0.1-pl
 ==============
 - Fixed comparison of percents.

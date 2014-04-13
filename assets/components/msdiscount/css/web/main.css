@@ -1,0 +1,3 @@
+.msd_remains .minutes:before,
+.msd_remains .seconds:before {content: ":";}
+.msd_remains .hours:before {content: " ";}
