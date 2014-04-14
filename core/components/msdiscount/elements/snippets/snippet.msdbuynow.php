@@ -75,12 +75,12 @@ if ($q->prepare() && $q->stmt->execute()) {
     }
 	while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
         if ($row['old_price'] == 0) {
-	        $row['old_price'] = $row['price'];
+	        $row['old_price'] = $miniShop2->formatPrice($row['price']);
 	    }
 	    if (strpos($row['sale_discount'], '%') !== false) {
-	        $row['price'] = $row['price'] - $row['price'] * $row['sale_discount'] / 100;
+	        $row['price'] = $miniShop2->formatPrice($row['price'] - $row['price'] * $row['sale_discount'] / 100);
 	    } else {
-	        $row['price'] = $row['price'] - $row['sale_discount'];
+	        $row['price'] = $miniShop2->formatPrice($row['price'] - $row['sale_discount']);
 	    }
         $row['remains'] = strtotime($row['sale_ends']) - time();
 		if ($outType == 'array') {
