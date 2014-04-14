@@ -1,5 +1,9 @@
 Changelog for msDiscount.
 
+1.0.3-pl
+==============
+- Added price formating
+
 1.0.2-pl
 ==============
 - Added Buy Now snippet.
