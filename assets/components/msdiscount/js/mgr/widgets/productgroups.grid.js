@@ -55,17 +55,17 @@ Ext.extend(msDiscount.grid.Products,MODx.grid.Grid,{
 	}
 
 	,createResourceGroup: function(btn,e) {
-		var createPage = MODx.action
-			? MODx.action['security/resourcegroup/index']
-			: 'security/resourcegroup/index';
+		var createPage = MODx.modx23
+			? 'security/resourcegroup'
+			: MODx.action['security/resourcegroup/index'];
 
 		window.open(MODx.config.manager_url + '?a=' + createPage);
 	}
 
 	,updateResourceGroup: function(btn,e,row) {
-		var updatePage = MODx.action
-			? MODx.action['security/resourcegroup/index']
-			: 'security/resourcegroup/index';
+		var updatePage = MODx.modx23
+			? 'security/resourcegroup'
+			: MODx.action['security/resourcegroup/index'];
 
 		window.open(MODx.config.manager_url + '?a=' + updatePage);
 	}

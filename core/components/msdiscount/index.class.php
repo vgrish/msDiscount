@@ -20,6 +20,12 @@ abstract class msDiscountMainController extends modExtraManagerController {
 			throw new Exception('You must install miniShop2 first');
 		}
 
+		$version = $this->modx->getVersionData();
+		$modx23 = !empty($version) && version_compare($version['full_version'], '2.3.0', '>=');
+		if (!$modx23) {
+			$this->addCss(MODX_ASSETS_URL . 'components/msearch2/css/mgr/font-awesome.min.css');
+		}
+
 		$this->msDiscount = new msDiscount($this->modx);
 		$this->miniShop2 = new miniShop2($this->modx);
 
@@ -32,12 +38,11 @@ abstract class msDiscountMainController extends modExtraManagerController {
 		$this->addJavascript($this->miniShop2->config['jsUrl'] . 'mgr/misc/ms2.combo.js');
 
 		$this->addHtml('<script type="text/javascript">
-		Ext.onReady(function() {
+			MODx.modx23 = ' . (int)$modx23 . ';
 			miniShop2.config = ' . $this->modx->toJSON($this->miniShop2->config) . ';
 			miniShop2.config.connector_url = "' . $this->miniShop2->config['connectorUrl'] . '";
 			msDiscount.config = ' . $this->modx->toJSON($this->msDiscount->config) . ';
 			msDiscount.config.connector_url = "' . $this->msDiscount->config['connectorUrl'] . '";
-		});
 		</script>');
 
 		parent::initialize();

@@ -29,6 +29,9 @@ class msdSaleCreateProcessor extends modObjectCreateProcessor {
 			}
 		}
 
+		$active = $this->getProperty('active');
+		$this->setProperty('active', !empty($active) && $active != 'false');
+
 		return parent::beforeSet();
 	}
 
