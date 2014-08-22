@@ -29,6 +29,9 @@ class msdSaleUpdateProcessor extends modObjectUpdateProcessor {
 			}
 		}
 
+		$active = $this->getProperty('active');
+		$this->setProperty('active', !empty($active) && $active != 'false');
+
 		return parent::beforeSet();
 	}
 

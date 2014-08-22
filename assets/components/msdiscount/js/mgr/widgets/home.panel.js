@@ -17,13 +17,14 @@ msDiscount.panel.Home = function(config) {
 		border: false
 		,deferredRender: true
 		,baseCls: 'modx-formpanel'
+		,layout: 'anchor'
 		,items: [{
 			html: '<h2>'+_('msdiscount') +'</h2>'
 			,border: false
 			,cls: 'modx-page-header container'
 		},{
 			xtype: 'modx-tabs'
-			,bodyStyle: 'padding: 5px'
+			//,bodyStyle: 'padding: 5px'
 			,defaults: { border: false ,autoHeight: true }
 			,border: true
 			,hideMode: 'offsets'
@@ -41,6 +42,7 @@ msDiscount.panel.Home = function(config) {
 					,bodyStyle: 'margin-bottom: 10px'
 				},{
 					xtype: 'msd-grid-sales'
+					,cls: 'main-wrapper'
 				}]
 			},{
 				title: _('msd_users')
@@ -52,6 +54,7 @@ msDiscount.panel.Home = function(config) {
 					,bodyStyle: 'margin-bottom: 10px'
 				},{
 					xtype: 'msd-grid-users'
+					,cls: 'main-wrapper'
 				}]
 			},{
 				title: _('msd_products')
@@ -63,6 +66,7 @@ msDiscount.panel.Home = function(config) {
 					,bodyStyle: 'margin-bottom: 10px'
 				},{
 					xtype: 'msd-grid-products'
+					,cls: 'main-wrapper'
 				}]
 			},{
 				title: _('msd_check')
@@ -74,6 +78,7 @@ msDiscount.panel.Home = function(config) {
 					,bodyStyle: 'margin-bottom: 10px'
 				},{
 					xtype: 'msd-form-check'
+					,cls: 'main-wrapper'
 				}]
 			}]
 		}]

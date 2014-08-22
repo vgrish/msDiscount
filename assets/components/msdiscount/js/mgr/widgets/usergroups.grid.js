@@ -55,7 +55,7 @@ Ext.extend(msDiscount.grid.Users,MODx.grid.Grid,{
 	}
 
 	,createUserGroup: function(btn,e) {
-		var createPage = MODx.action
+		var createPage = MODx.modx23
 			? MODx.action['security/permission']
 			: 'security/permission';
 
@@ -64,7 +64,8 @@ Ext.extend(msDiscount.grid.Users,MODx.grid.Grid,{
 	,updateUserGroup: function(btn,e,row) {
 		if (typeof(row) != 'undefined') {this.menu.record = row.data;}
 		var id = this.menu.record.id;
-		var updatePage = MODx.action
+
+		var updatePage = MODx.modx23
 			? MODx.action['security/usergroup/update']
 			: 'security/usergroup/update';
 

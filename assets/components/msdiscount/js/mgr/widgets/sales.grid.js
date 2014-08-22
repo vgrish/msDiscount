@@ -95,7 +95,7 @@ Ext.extend(msDiscount.grid.Sales,MODx.grid.Grid,{
 				},scope:this}
 			}
 		});
-		w.fp.getForm().reset();
+		//w.fp.getForm().reset();
 		w.show(e.target);
 	}
 
@@ -162,7 +162,7 @@ msDiscount.window.CreateSale = function(config) {
 	Ext.applyIf(config,{
 		title: _('msd_sales_create')
 		,id: this.ident
-		,height: 250
+		,autoHeight: true
 		,width: 600
 		,url: msDiscount.config.connector_url
 		,action: 'mgr/sales/create'
@@ -174,30 +174,35 @@ msDiscount.window.CreateSale = function(config) {
 Ext.extend(msDiscount.window.CreateSale,MODx.Window, {
 
 	getFields: function(config) {
-		var fields = {
-			name: {}
-			,discount: {anchor: '50%', value: 0}
-			,begins: {xtype: 'minishop2-xdatetime', anchor: '50%'}
-			,ends: {xtype: 'minishop2-xdatetime', anchor: '50%'}
-			,active: {xtype: 'xcheckbox'}
-			,resource: {xtype: 'minishop2-combo-resource', anchor: '75%'}
-			,image: {xtype: 'minishop2-combo-browser'}
-			,description: {xtype: 'textarea', height: 75}
-		};
-		var tmp = [];
-		for (var i in fields) {
-			if (fields.hasOwnProperty(i)) {
-				Ext.applyIf( fields[i], {
-					xtype: 'textfield'
-					,id: 'msd-'+ this.ident + i
-					,name: i
-					,fieldLabel: _('msd_sales_' +  i)
-					,anchor: '99%'
-				});
-				tmp.push(fields[i]);
+		return [
+			{xtype: 'hidden', name: 'id'}
+			,{xtype: 'textfield', name: 'name', fieldLabel: _('msd_sales_name'), anchor: '100%'}
+			,{
+				layout: 'column'
+				,border: false
+				,anchor: '100%'
+				,style: {margin: '10px 0 0 0'}
+				,items: [{
+					columnWidth: .5
+					,layout: 'form'
+					,items: [
+						{xtype: 'minishop2-xdatetime', name: 'begins', fieldLabel: _('msd_sales_begins'), anchor: '99%'}
+						,{xtype: 'textfield', name: 'discount', fieldLabel: _('msd_sales_discount'), anchor: '50%', value: 0}
+						,{xtype: 'minishop2-combo-resource', name: 'resource', fieldLabel: _('msd_sales_resource'), anchor: '99%'}
+					]
+				},{
+					columnWidth: .5
+					,layout: 'form'
+					,style: {margin: 0}
+					,items: [
+						{xtype: 'minishop2-xdatetime', name: 'ends', fieldLabel: _('msd_sales_ends'), anchor: '99%'}
+						,{xtype: 'combo-boolean', name: 'active', fieldLabel: _('msd_sales_active'), anchor: '50%', hiddenName: 'active', value: false}
+						,{xtype: 'minishop2-combo-browser', name: 'image', fieldLabel: _('msd_sales_image'), anchor: '100%'}
+					]
+				}]
 			}
-		}
-		return tmp;
+			,{xtype: 'textarea', name: 'description', fieldLabel: _('msd_sales_description'), anchor: '100%', height: 75}
+		];
 	}
 
 });
@@ -213,14 +218,14 @@ msDiscount.window.UpdateSale = function(config) {
 	Ext.applyIf(config,{
 		title: _('msd_sales_update') + '"' + config.record['name'] + '"'
 		,id: this.ident
-		,height: 250
-		,width: 600
+		,autoHeight: true
+		,width: 650
 		,url: msDiscount.config.connector_url
 		,action: 'mgr/sales/update'
 		,fields: [{
 			xtype: 'modx-tabs'
 			,id: 'msd-window-sales-update-tabs'
-			,bodyStyle: 'padding: 5px;'
+			,bodyStyle: MODx.modx23 ? '' : 'padding: 5px;'
 			,defaults: { border: false ,autoHeight: true }
 			,border: true
 			,hideMode: 'offsets'
@@ -264,31 +269,35 @@ msDiscount.window.UpdateSale = function(config) {
 Ext.extend(msDiscount.window.UpdateSale,MODx.Window, {
 
 	getMainFields: function(config) {
-		var fields = {
-			id: {xtype: 'hidden'}
-			,name: {}
-			,discount: {anchor: '50%', value: 0}
-			,begins: {xtype: 'minishop2-xdatetime', anchor: '50%'}
-			,ends: {xtype: 'minishop2-xdatetime', anchor: '50%'}
-			,active: {xtype: 'xcheckbox'}
-			,resource: {xtype: 'minishop2-combo-resource', anchor: '75%'}
-			,image: {xtype: 'minishop2-combo-browser'}
-			,description: {xtype: 'textarea', height: 75}
-		};
-		var tmp = [];
-		for (var i in fields) {
-			if (fields.hasOwnProperty(i)) {
-				Ext.applyIf( fields[i], {
-					xtype: 'textfield'
-					,id: 'msd-'+ this.ident + i
-					,name: i
-					,fieldLabel: _('msd_sales_' +  i)
-					,anchor: '99%'
-				});
-				tmp.push(fields[i]);
+		return [
+			{xtype: 'hidden', name: 'id'}
+			,{xtype: 'textfield', name: 'name', fieldLabel: _('msd_sales_name'), anchor: '100%'}
+			,{
+				layout: 'column'
+				,border: true
+				,anchor: '100%'
+				,style: {margin: '10px 0 0 0'}
+				,items: [{
+					columnWidth: .5
+					,layout: 'form'
+					,items: [
+						{xtype: 'minishop2-xdatetime', name: 'begins', fieldLabel: _('msd_sales_begins'), anchor: '99%'}
+						,{xtype: 'textfield', name: 'discount', fieldLabel: _('msd_sales_discount'), anchor: '50%', value: 0}
+						,{xtype: 'minishop2-combo-resource', name: 'resource', fieldLabel: _('msd_sales_resource'), anchor: '99%'}
+					]
+				},{
+					columnWidth: .5
+					,layout: 'form'
+					,style: {margin: 0}
+					,items: [
+						{xtype: 'minishop2-xdatetime', name: 'ends', fieldLabel: _('msd_sales_ends'), anchor: '99%'}
+						,{xtype: 'combo-boolean', name: 'active', fieldLabel: _('msd_sales_active'), anchor: '50%', hiddenName: 'active'}
+						,{xtype: 'minishop2-combo-browser', name: 'image', fieldLabel: _('msd_sales_image'), anchor: '100%'}
+					]
+				}]
 			}
-		}
-		return tmp;
+			,{xtype: 'textarea', name: 'description', fieldLabel: _('msd_sales_description'), anchor: '100%', height: 75}
+		];
 	}
 
 });

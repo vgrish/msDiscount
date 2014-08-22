@@ -33,8 +33,8 @@ msDiscount.combo.Group = function(config) {
 			,type: config.type
 		}
 		,tpl: new Ext.XTemplate(''
-			+'<tpl for="."><div class="minishop2-product-list-item">'
-			+'<span><small>({id})</small> <b>{name}</b> {discount}</span>'
+			+'<tpl for="."><div class="x-combo-list-item minishop2-product-list-item">'
+			+'<small><sup>({id})</sup></small> <b>{name}</b> {discount}</span>'
 			+'</div></tpl>',{
 			compiled: true
 		})
