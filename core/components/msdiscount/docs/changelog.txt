@@ -1,5 +1,9 @@
 Changelog for msDiscount.
 
+1.0.5-pl
+==============
+- Added dependence from miniShop2 in the installer.
+
 1.0.4-pl
 ==============
 - Compatibility with MODX 2.3.
