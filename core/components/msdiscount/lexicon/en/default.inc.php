@@ -15,10 +15,16 @@ $_lang['msd_products_desc'] = 'Manage groups of goods. You can specify a persona
 
 $_lang['msd_submit'] = 'Test';
 $_lang['msd_clear'] = 'Clear';
-$_lang['msd_menu_create'] = 'Create new record';
-$_lang['msd_menu_update'] = 'Update record';
-$_lang['msd_menu_remove'] = 'Remove record';
-$_lang['msd_menu_remove_confirm'] = 'Are you sure you want to remove this record?';
+
+$_lang['msd_btn_sale_create'] = 'Add sale';
+$_lang['msd_btn_group_create'] = 'Create group';
+
+$_lang['msd_action_update'] = 'Update';
+$_lang['msd_action_disable'] = 'Disable';
+$_lang['msd_action_enable'] = 'Enable';
+$_lang['msd_action_remove'] = 'Remove';
+$_lang['msd_action_remove_confirm'] = 'Are you sure you want to remove this record?';
+$_lang['msd_actions'] = 'Actions';
 
 $_lang['msd_err_ae'] = 'This value must be unique';
 $_lang['msd_err_ns'] = 'This field is required';
@@ -37,9 +43,6 @@ $_lang['msd_sales_ends'] = 'Ends';
 $_lang['msd_sales_active'] = 'Active';
 $_lang['msd_sales_resource'] = 'Linked with page';
 $_lang['msd_sales_image'] = 'Image';
-
-$_lang['msd_group_create'] = 'Create group';
-$_lang['msd_group_update'] = 'Update ';
 
 $_lang['msd_group_id'] = 'Id';
 $_lang['msd_group_name'] = 'Name';

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Get a list of Items
  */
@@ -9,10 +10,14 @@ class msdSaleMemberGetListProcessor extends modObjectGetListProcessor {
 	public $linkedKey2 = '';
 	public $defaultSortField = 'name';
 	public $defaultSortDirection = 'DESC';
-	public $renderers = '';
+	protected $_modx23;
 
 
 	public function initialize() {
+		/** @var msDiscount $msDiscount */
+		$msDiscount = $this->modx->getService('msDiscount');
+		$this->_modx23 = $msDiscount->systemVersion();
+
 		switch ($this->getProperty('type')) {
 			case 'users':
 				$this->linkedKey1 = 'msdUserGroup';
@@ -27,6 +32,7 @@ class msdSaleMemberGetListProcessor extends modObjectGetListProcessor {
 		return parent::initialize();
 	}
 
+
 	/**
 	 * @param xPDOQuery $c
 	 *
@@ -38,8 +44,8 @@ class msdSaleMemberGetListProcessor extends modObjectGetListProcessor {
 			'sale_id' => $this->getProperty('sale_id'),
 		));
 
-		$c->leftJoin($this->linkedKey1, $this->linkedKey1, $this->classKey.'.group_id = '.$this->linkedKey1.'.id');
-		$c->leftJoin($this->linkedKey2, $this->linkedKey2, $this->classKey.'.group_id = '.$this->linkedKey2.'.id');
+		$c->leftJoin($this->linkedKey1, $this->linkedKey1, $this->classKey . '.group_id = ' . $this->linkedKey1 . '.id');
+		$c->leftJoin($this->linkedKey2, $this->linkedKey2, $this->classKey . '.group_id = ' . $this->linkedKey2 . '.id');
 
 		$c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
 		$c->select($this->modx->getSelectColumns($this->linkedKey1, $this->linkedKey1));
@@ -56,6 +62,19 @@ class msdSaleMemberGetListProcessor extends modObjectGetListProcessor {
 	 */
 	public function prepareRow(xPDOObject $object) {
 		$array = $object->toArray();
+
+		$icon = $this->_modx23 ? 'icon' : 'fa';
+		$array['actions'] = array();
+
+		$array['actions'][] = array(
+			'cls' => '',
+			'icon' => "$icon $icon-trash-o action-red",
+			'title' => $this->modx->lexicon('msd_action_remove'),
+			'multiple' => $this->modx->lexicon('msd_action_remove'),
+			'action' => 'removeGroup',
+			'button' => true,
+			'menu' => true,
+		);
 
 		return $array;
 	}

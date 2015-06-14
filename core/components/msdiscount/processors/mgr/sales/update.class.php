@@ -9,9 +9,11 @@ class msdSaleUpdateProcessor extends modObjectUpdateProcessor {
 
 	/** {inheritDoc} */
 	public function beforeSet() {
+		$msDiscount = $this->modx->getService('msDiscount');
+
 		$properties = $this->getProperties();
 		foreach ($properties as $k => $v) {
-			$properties[$k] = $this->modx->msDiscount->sanitize($k, $v);
+			$properties[$k] = $msDiscount->sanitize($k, $v);
 		}
 		$this->setProperties($properties);
 
