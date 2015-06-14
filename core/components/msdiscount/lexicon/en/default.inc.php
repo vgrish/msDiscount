@@ -90,6 +90,6 @@ $_lang['msd_dbg_personal_products'] = 'Discount on all items of the group (id = 
 $_lang['msd_dbg_discount_percent_to_abs'] = 'Consider the percentage of [[+percent]] product prices [[+price]] - goes <b>[[+discount]]</b>.';
 $_lang['msd_dbg_discount_abs_vs_percent'] = 'Compare absolute discount [[+absolute]] посчитанным percentage [[+percent]].';
 $_lang['msd_dbg_discount_total'] = "The resulting discount <b>[[+discount]]</b>\nTotal product price <b>[[+price]]</b>.";
-$_lang['msd_dbg_discount_less'] = "Skip discount <b>[[+discount]]</b>because it is smaller than the current.";
+$_lang['msd_dbg_discount_less'] = "Skip discount <b>[[+discount]]</b> because it is smaller than the current.";
 $_lang['msd_dbg_discount_no'] = 'No discounts, return the original price of the <b>[[+price]]</b>.';
 $_lang['msd_dbg_time'] = "\nSpent time: <b>[[+time]]</b> <small>s.</small>";

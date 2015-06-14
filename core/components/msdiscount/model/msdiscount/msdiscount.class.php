@@ -274,7 +274,10 @@ class msDiscount {
 			$q->leftJoin('msdUserGroup', 'msdUserGroup', 'msdUserGroup.id = modUserGroupMember.user_group');
 			$q->select('user_group,discount');
 			$q->sortby('discount');
+			$tstart = microtime(true);
 			if ($q->prepare() && $q->stmt->execute()) {
+				$this->modx->queryTime += microtime(true) - $tstart;
+				$this->modx->executedQueries++;
 				while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
 					$groups[$row['user_group']] = $row['discount'];
 				}
@@ -299,11 +302,24 @@ class msDiscount {
 		}
 		$groups = array();
 
-		$q = $this->modx->newQuery('modResourceGroupResource', array('document' => $id));
+		if ($product = $this->modx->getObject('msProduct', $id)) {
+			$ids = $this->modx->getParentIds($id, 10, array('context' => $product->get('context_key')));
+			$ids[] = $id;
+			$where = array('document:IN' => $ids);
+		}
+		else {
+			$where = array('document' => $id);
+		}
+
+		$q = $this->modx->newQuery('modResourceGroupResource', $where);
 		$q->leftJoin('msdProductGroup', 'msdProductGroup', 'msdProductGroup.id = modResourceGroupResource.document_group');
-		$q->select('document_group,discount');
+		$q->select('document_group, discount');
 		$q->sortby('discount');
+		$q->groupby('msdProductGroup.id');
+		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
+			$this->modx->queryTime += microtime(true) - $tstart;
+			$this->modx->executedQueries++;
 			while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
 				$groups[$row['document_group']] = $row['discount'];
 			}
@@ -378,6 +394,5 @@ class msDiscount {
 			$this->debug[] = $this->modx->lexicon($message, $data);
 		}
 	}
-
 
 }

@@ -1,5 +1,9 @@
 Changelog for msDiscount.
 
+1.1.0-pl
+==============
+- Ability to add discounts for product category.
+
 1.0.5-pl
 ==============
 - Added dependence from miniShop2 in the installer.
@@ -11,7 +15,7 @@ Changelog for msDiscount.
 
 1.0.3-pl
 ==============
-- Added price formating
+- Added price formatting
 
 1.0.2-pl
 ==============
