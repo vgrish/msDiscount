@@ -44,9 +44,9 @@ Ext.extend(msDiscount.panel.CheckDiscount,MODx.FormPanel,{
 			user: {xtype: 'minishop2-combo-user', anchor: '40%', allowBlank: true},
 			date: {xtype: 'minishop2-xdatetime', anchor: '40%', allowBlank: true},
 			log: {
-				anchor: '90%',
+				anchor: '60%',
 				//height: 150,
-				style: 'border:1px solid #efefef; min-height: 50px; border-radius:2px; font:normal 11px Arial; padding: 10px;'
+				style: 'border:1px solid #efefef; min-height: 100px; border-radius:2px; font:normal 11px Arial; padding: 10px; overflow: auto;'
 			}
 		};
 

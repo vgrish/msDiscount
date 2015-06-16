@@ -7,11 +7,6 @@ class msdSaleMemberRemoveProcessor extends modObjectRemoveProcessor {
 	public $permission = 'msdiscount_save';
 
 	public function initialize() {
-		//$primaryKey = $this->getProperty($this->primaryKeyField,false);
-		//if (empty($primaryKey)) return $this->modx->lexicon($this->objectType.'_err_ns');
-		//$this->object = $this->modx->getObject($this->classKey,$primaryKey);
-
-
 		$this->object = $this->modx->getObject($this->classKey, array(
 			'sale_id' => $this->getProperty('sale_id'),
 			'group_id' => $this->getProperty('group_id'),

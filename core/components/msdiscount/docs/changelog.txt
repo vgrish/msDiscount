@@ -3,6 +3,7 @@ Changelog for msDiscount.
 1.1.0-pl
 ==============
 - Ability to add discounts for product category.
+- Disposable discount coupons.
 - Improved manager pages.
 
 1.0.5-pl

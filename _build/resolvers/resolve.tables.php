@@ -9,6 +9,7 @@ if ($object->xpdo) {
 
 	switch ($options[xPDOTransport::PACKAGE_ACTION]) {
 		case xPDOTransport::ACTION_INSTALL:
+		case xPDOTransport::ACTION_UPGRADE:
 			$modelPath = $modx->getOption('msdiscount_core_path',null,$modx->getOption('core_path').'components/msdiscount/').'model/';
 			$modx->addPackage('msdiscount', $modelPath);
 
@@ -18,6 +19,8 @@ if ($object->xpdo) {
 				'msdUserGroup',
 				'msdProductGroup',
 				'msdSaleMember',
+				'msdCouponGroup',
+				'msdCoupon',
 			);
 			foreach ($tmp as $v) {
 				$manager->createObjectContainer($v);
@@ -47,10 +50,6 @@ if ($object->xpdo) {
 					$new->save();
 				}
 			}
-
-			break;
-
-		case xPDOTransport::ACTION_UPGRADE:
 			break;
 
 		case xPDOTransport::ACTION_UNINSTALL:

@@ -1,28 +1,18 @@
 msDiscount.grid.Sales = function(config) {
 	config = config || {};
-	Ext.applyIf(config,{
-		id: 'msd-grid-sales',
+	Ext.applyIf(config, {
+		layout: 'anchor',
 		url: msDiscount.config.connector_url,
 		baseParams: {
 			action: 'mgr/sales/getlist'
 		},
-		autosave: true,
-		save_action: 'mgr/sales/updatefromgrid',
-		//preventSaveRefresh: false,
-		fields: ['id','discount','name','description','begins','ends','active','image', 'actions'],
+		fields: ['id', 'discount', 'name', 'description', 'begins', 'ends', 'active', 'image', 'actions'],
 		autoHeight: true,
 		paging: true,
 		remoteSort: true,
 		columns: this.getColumns(config),
 		sm: new Ext.grid.CheckboxSelectionModel(),
-		tbar: [{
-			text: (MODx.modx23
-				? '<i class="icon icon-plus"></i> '
-				: '<i class="fa fa-plus"></i> ')
-			+ _('msd_btn_sale_create'),
-			handler: this.createSale,
-			scope: this
-		}],
+		tbar: this.getTopBar(config),
 		viewConfig: {
 			forceFit: true,
 			enableRowBody: true,
@@ -37,13 +27,12 @@ msDiscount.grid.Sales = function(config) {
 				return cls.join(' ');
 			}
 		},
-		/*
 		listeners: {
 			rowDblClick: function(grid, rowIndex, e) {
 				var row = grid.store.getAt(rowIndex);
 				this.updateSale(grid, e, row);
 			}
-		}*/
+		}
 	});
 	msDiscount.grid.Sales.superclass.constructor.call(this,config);
 };
@@ -78,16 +67,27 @@ Ext.extend(msDiscount.grid.Sales,MODx.grid.Grid,{
 		return this.processEvent('click', e);
 	},
 
+	getTopBar: function(config) {
+		return [{
+			text: (MODx.modx23
+				? '<i class="icon icon-plus"></i> '
+				: '<i class="fa fa-plus"></i> ')
+			+ _('msd_btn_sale_create'),
+			handler: this.createSale,
+			scope: this
+		}];
+	},
+
 	getColumns: function(config) {
 		var columns = {
 			id: {hidden: true, width: 50},
-			name: {width: 100, editor: {xtype: 'textfield'}},
-			discount: {width: 100, editor: {xtype: 'textfield'}},
+			name: {width: 100},
+			discount: {width: 75},
 			description: {hidden: true},
-			begins: {width: 100, renderer: miniShop2.utils.formatDate},
-			ends: {width: 100, renderer: miniShop2.utils.formatDate},
-			active: {width: 50, editor: {xtype: 'combo-boolean', renderer:'boolean'}},
-			image: {width: 100, renderer: this.renderThumb},
+			begins: {width: 75, renderer: miniShop2.utils.formatDate},
+			ends: {width: 75, renderer: miniShop2.utils.formatDate},
+			active: {width: 50, renderer: msDiscount.utils.renderBoolean/*, editor: {xtype: 'combo-boolean', renderer:'boolean'}*/},
+			image: {width: 75, renderer: this.renderThumb, sortable: false},
 			actions: {width: 75, renderer: msDiscount.utils.renderActions, sortable: false, id: 'actions', header: _('msd_actions')}
 		};
 		var tmp = [];
@@ -95,7 +95,8 @@ Ext.extend(msDiscount.grid.Sales,MODx.grid.Grid,{
 			if (columns.hasOwnProperty(i)) {
 				Ext.applyIf( columns[i], {
 					header: _('msd_sales_' +  i),
-					dataIndex:  i
+					dataIndex: i,
+					sortable: true,
 				});
 				tmp.push(columns[i]);
 			}
@@ -113,22 +114,29 @@ Ext.extend(msDiscount.grid.Sales,MODx.grid.Grid,{
 	},
 
 	createSale: function(btn,e) {
-		var w = Ext.getCmp('msd-window-sale-create');
-		if (w) {w.close();}
+		var id = 'msd-window-sale-create';
+		var w = Ext.getCmp(id);
+		if (w) {return;}
 
 		w = MODx.load({
-			xtype: 'msd-window-sale-create',
-			id: 'msd-window-sale-create',
+			id: id,
+			xtype: 'msd-window-sale',
+			record: {id: 0},
+			mode: 'create',
 			listeners: {
 				success: {fn:function(response) {
 					this.refresh();
 					if (response.a.result.object) {
-						this.updateSale('','',{data: response.a.result.object}, 1);
+						this.updateSale('', '', {data: response.a.result.object}, 1);
 					}
-				},scope:this}
+				}, scope:this},
+				hide: function(item) {
+					window.setTimeout(function() {
+						item.close();
+					}, 100);
+				}
 			}
 		});
-		//w.fp.getForm().reset();
 		w.show(e.target);
 	},
 
@@ -145,19 +153,19 @@ Ext.extend(msDiscount.grid.Sales,MODx.grid.Grid,{
 			},
 			listeners: {
 				success: {fn:function(r) {
-					var w = Ext.getCmp('msd-window-sale-update');
-					if (w) {w.close();}
-					w = MODx.load({
-						xtype: 'msd-window-sale-update',
-						id: 'msd-window-sale-update',
+					var w = MODx.load({
+						xtype: 'msd-window-sale',
 						record: r.object,
+						mode: 'update',
 						listeners: {
-							success: {fn:function() {this.refresh();},scope:this},
+							success: {fn: function() {
+								this.refresh();
+							}, scope: this},
 							afterrender: {fn:function() {
 								if (tab != 0) {
-									Ext.getCmp('msd-window-sales-update-tabs').setActiveTab(tab);
+									Ext.getCmp(this.config.id + '-tabs').setActiveTab(tab);
 								}
-							}}
+							}},
 						}
 					});
 					w.fp.getForm().reset();
@@ -231,117 +239,70 @@ Ext.extend(msDiscount.grid.Sales,MODx.grid.Grid,{
 	},
 
 });
-Ext.reg('msd-grid-sales',msDiscount.grid.Sales);
+Ext.reg('msd-grid-sales', msDiscount.grid.Sales);
 
 
-msDiscount.window.CreateSale = function(config) {
+msDiscount.window.Sale = function(config) {
 	config = config || {};
-	this.ident = config.ident || 'mecsale'+Ext.id();
-	Ext.applyIf(config,{
-		title: _('msd_sales_create'),
-		id: this.ident,
-		autoHeight: true,
-		width: 600,
-		url: msDiscount.config.connector_url,
-		action: 'mgr/sales/create',
-		fields: this.getFields(config),
-		keys: [{key: Ext.EventObject.ENTER,shift: true,fn: function() {this.submit()},scope: this}]
-	});
-	msDiscount.window.CreateSale.superclass.constructor.call(this,config);
-};
-Ext.extend(msDiscount.window.CreateSale,MODx.Window, {
-
-	getFields: function(config) {
-		return [
-			{xtype: 'hidden', name: 'id'},
-			{xtype: 'textfield', name: 'name', fieldLabel: _('msd_sales_name'), anchor: '100%'},
-			{
-				layout: 'column',
-				border: false,
-				anchor: '100%',
-				style: {margin: '10px 0 0 0'},
-				items: [{
-					columnWidth: .5,
-					layout: 'form',
-					items: [
-						{xtype: 'minishop2-xdatetime', name: 'begins', fieldLabel: _('msd_sales_begins'), anchor: '99%'},
-						{xtype: 'textfield', name: 'discount', fieldLabel: _('msd_sales_discount'), anchor: '50%', value: 0},
-						{xtype: 'minishop2-combo-resource', name: 'resource', fieldLabel: _('msd_sales_resource'), anchor: '99%'}
-					]
-				},{
-					columnWidth: .5,
-					layout: 'form',
-					style: {margin: 0},
-					items: [
-						{xtype: 'minishop2-xdatetime', name: 'ends', fieldLabel: _('msd_sales_ends'), anchor: '99%'},
-						{xtype: 'combo-boolean', name: 'active', fieldLabel: _('msd_sales_active'), anchor: '50%', hiddenName: 'active', value: false},
-						{xtype: 'minishop2-combo-browser', name: 'image', fieldLabel: _('msd_sales_image'), anchor: '100%'}
-					]
-				}]
-			},
-			{xtype: 'textarea', name: 'description', fieldLabel: _('msd_sales_description'), anchor: '100%', height: 75}
-		];
+	if (!config.id) {
+		config.id = Ext.id();
 	}
-});
-Ext.reg('msd-window-sale-create',msDiscount.window.CreateSale);
 
-
-msDiscount.window.UpdateSale = function(config) {
-	config = config || {};
-	this.ident = config.ident || 'mecsale'+Ext.id();
-
-	Ext.applyIf(config,{
-		title: _('msd_sales_update') + '"' + config.record['name'] + '"',
-		id: this.ident,
+	Ext.applyIf(config, {
+		id: config.id,
+		title: _('msd_sales_' + (config['mode'] || 'create'))
+			+ (config['mode'] == 'update' ? '"' + config.record['name'] + '"' : ''),
 		autoHeight: true,
 		width: 650,
 		url: msDiscount.config.connector_url,
-		action: 'mgr/sales/update',
-		fields: [{
+		action: 'mgr/sales/' + (config['mode'] || 'create'),
+		fields: this.getTabs(config),
+		keys: this.getKeys(config)
+	});
+	msDiscount.window.Sale.superclass.constructor.call(this,config);
+};
+Ext.extend(msDiscount.window.Sale, MODx.Window, {
+
+	getTabs: function(config) {
+		return [{
+			id: config.id + '-tabs',
 			xtype: 'modx-tabs',
-			id: 'msd-window-sales-update-tabs',
 			bodyStyle: MODx.modx23 ? '' : 'padding: 5px;',
-			defaults: { border: false ,autoHeight: true },
+			defaults: { border: false, autoHeight: true },
 			border: true,
-			hideMode: 'offsets',
-			deferredRender: false,
 			activeTab: 0,
 			autoHeight: true,
 			stateful: true,
-			stateId: 'msd-window-sales-update-tabs',
+			stateId: 'msd-window-sales-' + config['mode'],
 			stateEvents: ['tabchange'],
 			getState:function() {return {activeTab: this.items.indexOf(this.getActiveTab())};},
 			items: [{
 				title: _('msd_sales_main'),
 				layout: 'form',
-				hideMode: 'offsets',
 				items: this.getMainFields(config)
 			},{
 				title: _('msd_users'),
+				disabled: config['mode'] == 'create',
+				layout: 'anchor',
 				items: {
 					xtype: 'msd-grid-sales-group',
-					id: 'msd-grid-sales-group-users',
 					record: config.record,
 					type: 'users',
 					sale_id: config.record.id
 				}
 			},{
 				title: _('msd_products'),
+				disabled: config['mode'] == 'create',
+				layout: 'anchor',
 				items: {
 					xtype: 'msd-grid-sales-group',
-					id: 'msd-grid-sales-group-products',
 					record: config.record,
 					type: 'products',
 					sale_id: config.record.id
 				}
 			}]
-		}],
-		//fields: this.getFields(config),
-		keys: [{key: Ext.EventObject.ENTER,shift: true,fn: function() {this.submit()},scope: this}]
-	});
-	msDiscount.window.UpdateSale.superclass.constructor.call(this,config);
-};
-Ext.extend(msDiscount.window.UpdateSale,MODx.Window, {
+		}];
+	},
 
 	getMainFields: function(config) {
 		return [
@@ -366,67 +327,53 @@ Ext.extend(msDiscount.window.UpdateSale,MODx.Window, {
 					style: {margin: 0},
 					items: [
 						{xtype: 'minishop2-xdatetime', name: 'ends', fieldLabel: _('msd_sales_ends'), anchor: '99%'},
-						{xtype: 'combo-boolean', name: 'active', fieldLabel: _('msd_sales_active'), anchor: '50%', hiddenName: 'active'},
+						{xtype: 'combo-boolean', name: 'active', fieldLabel: _('msd_sales_active'), anchor: '50%', hiddenName: 'active', value: true},
 						{xtype: 'minishop2-combo-browser', name: 'image', fieldLabel: _('msd_sales_image'), anchor: '100%'}
 					]
 				}]
 			},
 			{xtype: 'textarea', name: 'description', fieldLabel: _('msd_sales_description'), anchor: '100%', height: 75}
 		];
-	}
+	},
+
+	getKeys: function() {
+		return [{
+			key: Ext.EventObject.ENTER,
+			shift: true,
+			fn: function() {
+				this.submit()
+			}, scope: this
+		}];
+	},
+
+	loadDropZones: function() {},
 
 });
-Ext.reg('msd-window-sale-update',msDiscount.window.UpdateSale);
+Ext.reg('msd-window-sale', msDiscount.window.Sale);
 
 
 msDiscount.grid.SalesMemberGroup = function(config) {
 	config = config || {};
+	if (!config.id) {
+		config.id = Ext.id();
+	}
 	Ext.applyIf(config, {
-		id: 'msd-grid-sales-group',
+		layout: 'anchor',
+		id: config.id,
 		url: msDiscount.config.connector_url,
 		baseParams: {
 			action: 'mgr/sales/members/getlist',
 			type: config.type,
 			sale_id: config.record.id
 		},
-		autosave: true,
-		save_action: 'mgr/sales/members/updatefromgrid',
 		fields: ['sale_id', 'group_id', 'type', 'relation', 'name', 'discount', 'actions'],
 		autoHeight: true,
 		paging: true,
 		remoteSort: true,
 		pageSize: 5,
-		columns: [{
-			header: _('msd_group_name'),
-			dataIndex: 'name',
-			width: 100
-		}, {
-			header: _('msd_members_relation'),
-			dataIndex: 'relation',
-			width: 50,
-			renderer: this.renderRelation,
-			editor: {xtype: 'msd-combo-relation'}
-		}, {
-			header: _('msd_group_discount'),
-			dataIndex: 'discount',
-			width: 50
-		}, {
-			header: _('msd_actions'),
-			dataIndex: 'actions',
-			width: 35,
-			renderer: msDiscount.utils.renderActions,
-			sortable: false,
-			id: 'actions',
-		}],
-		tbar: [{
-			xtype: 'msd-combo-group',
-			id: 'msd-combo-group-' + config.type,
-			type: config.type,
-			sale_id: config.record.id,
-			listeners: {
-				select: {fn: this.addGroup, scope: this}
-			}
-		}]
+		sm: new Ext.grid.CheckboxSelectionModel(),
+		tbar: this.getTopBar(config),
+		columns: this.getColumns(config),
 	});
 	msDiscount.grid.SalesMemberGroup.superclass.constructor.call(this, config);
 };
@@ -458,19 +405,40 @@ Ext.extend(msDiscount.grid.SalesMemberGroup, MODx.grid.Grid, {
 		return this.processEvent('click', e);
 	},
 
-	renderRelation: function(value) {
-		if (value == 'in') {
-			return '<span style="color:green;">' + _('msd_members_relation_in') + '</span>';
-		}
-		else if (value == 'out') {
-			return '<span style="color:red;">' + _('msd_members_relation_out') + '</span>';
-		}
-		else {
-			return value;
-		}
+	getTopBar: function(config) {
+		return [{
+			xtype: 'msd-combo-group',
+			id: config.id + '-combo',
+			type: config.type,
+			sale_id: config.record.id,
+			listeners: {
+				select: {fn: this.addMember, scope: this}
+			}
+		}];
 	},
 
-	addGroup: function(combo, row) {
+	getColumns: function() {
+		var columns = {
+			name: {width: 75},
+			relation: {width: 50, header: _('msd_members_relation'), renderer: this._renderRelation},
+			discount: {width: 50},
+			actions: {width: 50, renderer: msDiscount.utils.renderActions, sortable: false, id: 'actions', header: _('msd_actions')}
+		};
+		var tmp = [];
+		for (var i in columns) {
+			if (columns.hasOwnProperty(i)) {
+				Ext.applyIf( columns[i], {
+					header: _('msd_group_' +  i),
+					dataIndex: i,
+					sortable: true,
+				});
+				tmp.push(columns[i]);
+			}
+		}
+		return tmp;
+	},
+
+	addMember: function(combo, row) {
 		combo.reset();
 
 		MODx.Ajax.request({
@@ -492,24 +460,70 @@ Ext.extend(msDiscount.grid.SalesMemberGroup, MODx.grid.Grid, {
 		});
 	},
 
-	removeGroup: function(btn, e) {
+	memberAction: function(method) {
+		var ids = this._getSelectedIds();
+		if (!ids.length) {
+			return false;
+		}
 		MODx.Ajax.request({
-			url: this.config.url,
+			url: msDiscount.config.connector_url,
 			params: {
-				action: 'mgr/sales/members/remove',
-				sale_id: this.config.sale_id,
-				group_id: this.menu.record.group_id,
-				type: this.config.type
+				action: 'mgr/sales/members/multiple',
+				method: method,
+				ids: Ext.util.JSON.encode(ids),
 			},
 			listeners: {
 				success: {
-					fn: function(r) {
+					fn: function() {
 						this.refresh();
-						Ext.getCmp('msd-combo-group-' + this.config.type).getStore().reload();
+						Ext.getCmp(this.config.id + '-combo').getStore().reload();
 					}, scope: this
-				}
+				},
+				failure: {
+					fn: function (response) {
+						MODx.msg.alert(_('error'), response.message);
+					}, scope: this
+				},
 			}
-		});
+		})
+	},
+
+	switchMember: function() {
+		this.memberAction('switch');
+	},
+
+	removeMember: function() {
+		this.memberAction('remove');
+	},
+
+	_renderRelation: function(value) {
+		if (value == 'in') {
+			return '<span style="color:green;">' + _('msd_members_relation_in') + '</span>';
+		}
+		else if (value == 'out') {
+			return '<span style="color:red;">' + _('msd_members_relation_out') + '</span>';
+		}
+		else {
+			return value;
+		}
+	},
+
+	_getSelectedIds: function() {
+		var ids = [];
+		var selected = this.getSelectionModel().getSelections();
+
+		for (var i in selected) {
+			if (!selected.hasOwnProperty(i)) {
+				continue;
+			}
+			ids.push({
+				sale_id: selected[i]['data']['sale_id'],
+				group_id: selected[i]['data']['group_id'],
+				type: selected[i]['data']['type'],
+			});
+		}
+
+		return ids;
 	},
 
 });

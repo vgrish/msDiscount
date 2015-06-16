@@ -56,6 +56,58 @@ switch ($modx->event->name) {
 		}
 		break;
 
+	case 'msOnBeforeAddToOrder':
+		/** @var string $key */
+		if ($key == 'coupon_code' && !empty($value)) {
+			$check = $msDiscount->checkCoupon($value);
+			if ($check !== true) {
+				$modx->event->output($check);
+			}
+		}
+		break;
+
+	case 'msOnGetOrderCost':
+		/**@var msOrderInterface $order */
+		if (!empty($with_cart) && !empty($cost)) {
+			if ($data = $order->get()) {
+				if (!empty($data['coupon_code']) && $msDiscount->checkCoupon($data['coupon_code']) === true) {
+					if ($discount = $msDiscount->getCouponDiscount($data['coupon_code'], $cost)) {
+						$cost -= $discount;
+						if ($cost >= 0) {
+							$modx->event->returnedValues['cost'] = $cost;
+						}
+					}
+				}
+			}
+		}
+		break;
+
+	case 'msOnCreateOrder':
+		/**@var msOrderInterface $order */
+		if ($data = $order->get()) {
+			/**@var msdCoupon $coupon */
+			if (!empty($data['coupon_code']) && $coupon = $modx->getObject('msdCoupon', array('code' => $data['coupon_code']))) {
+				/**@var msOrder $msOrder */
+				$coupon->fromArray(array(
+					'active' => false,
+					'activatedon' => date('Y-m-d H:i:s'),
+					'order_id' => $msOrder->get('id'),
+				));
+				$coupon->save();
+				$properties = $msOrder->get('properties');
+				if (!is_array($properties)) {
+					$properties = array();
+				}
+				$properties['coupon_code'] = $coupon->get('code');
+				if ($group = $coupon->getOne('Group')) {
+					$properties['coupon_discount'] = $group->get('discount');
+				}
+				$msOrder->set('properties', $properties);
+				$msOrder->save();
+			}
+		}
+		break;
+
 	case 'OnWebLogin':
 	case 'OnWebLogout':
 		/** Set flag for cart reload */

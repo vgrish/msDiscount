@@ -28,6 +28,37 @@
 		<composite alias="Members" class="msdSaleMember" local="id" foreign="sale_id" cardinality="many" owner="local" />
 	</object>
 
+	<object class="msdCouponGroup" table="ms2d_coupons_group" extends="xPDOSimpleObject">
+		<field key="name" dbtype="varchar" precision="255" phptype="string" null="false" />
+		<field key="discount" dbtype="varchar" precision="10" phptype="string" null="false" />
+		<field key="begins" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
+		<field key="ends" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
+		<field key="coupons" dbtype="int" phptype="int" null="true" default="0" />
+		<field key="activated" dbtype="int" phptype="int" null="true" default="0" />
+		<field key="prefix" dbtype="char" precision="5" phptype="string" null="true" default="" />
+
+		<composite alias="Coupons" class="msdCoupon" local="id" foreign="group_id" cardinality="many" owner="local" />
+	</object>
+
+	<object class="msdCoupon" table="ms2d_coupons" extends="xPDOSimpleObject">
+		<field key="group_id" dbtype="int" phptype="int" null="false" />
+		<field key="code" dbtype="char" precision="20" phptype="string" null="false" index="unique" />
+		<field key="createdon" dbtype="timestamp" phptype="timestamp" null="true" default="CURRENT_TIMESTAMP" />
+		<field key="activatedon" dbtype="timestamp" phptype="timestamp" null="true" default="0000-00-00 00:00:00" />
+		<field key="active" dbtype="tinyint" precision="1" phptype="boolean" attributes="unsigned" null="true" default="1" />
+		<field key="order_id" dbtype="int" precision="10" phptype="int" null="true" default="" />
+
+		<index alias="code" name="code" primary="false" unique="true" type="BTREE">
+			<column key="code" length="" collation="A" null="false" />
+		</index>
+		<index alias="active" name="active" primary="false" unique="false" type="BTREE">
+			<column key="active" length="" collation="A" null="false" />
+		</index>
+
+		<aggregate alias="Group" class="msdCouponGroup" local="group_id" foreign="id" cardinality="one" owner="foreign" />
+		<aggregate alias="Order" class="msOrder" local="order_id" foreign="id" cardinality="one" owner="local" />
+	</object>
+
 	<object class="msdUserGroup" table="ms2d_user_groups" extends="xPDOSimpleObject">
 		<field key="discount" dbtype="varchar" precision="10" phptype="string" null="true" default="0" />
 		<field key="joinsum" dbtype="decimal" precision="10,2" phptype="float" null="true" default="0" />
@@ -38,8 +69,8 @@
 
 		<composite alias="Members" class="msdSaleMember" local="id" foreign="group_id" owner="local" cardinality="many">
 			<criteria target="foreign"><![CDATA[
-            {"type":"users"}
-            ]]></criteria>
+			{"type":"users"}
+			]]></criteria>
 		</composite>
 	</object>
 
@@ -48,8 +79,8 @@
 
 		<composite alias="Members" class="msdSaleMember" local="id" foreign="group_id" owner="local" cardinality="many">
 			<criteria target="foreign"><![CDATA[
-            {"type":"products"}
-            ]]></criteria>
+			{"type":"products"}
+			]]></criteria>
 		</composite>
 	</object>
 

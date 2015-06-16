@@ -257,6 +257,65 @@ class msDiscount {
 
 
 	/**
+	 * Check coupon by code
+	 *
+	 * @param $code
+	 *
+	 * @return bool|null|string
+	 */
+	public function checkCoupon($code) {
+		/** @var msdCoupon $coupon */
+		if (!$coupon = $this->modx->getObject('msdCoupon', array('code' => $code))) {
+			return $this->modx->lexicon('msd_err_coupon_code');
+		}
+		if (!$coupon->get('active')) {
+			return $this->modx->lexicon('msd_err_coupon_active');
+		}
+
+		$group = $coupon->getOne('Group');
+		$begins = $group->get('begins');
+		if (!in_array($begins, array('', '0000-00-00-00 00:00:00', '-1-11-30 00:00:00')) && time() < strtotime($begins)) {
+			return $this->modx->lexicon('msd_err_coupon_begins');
+		}
+		$ends = $group->get('ends');
+		if (!in_array($ends, array('', '0000-00-00-00 00:00:00', '-1-11-30 00:00:00')) && time() > strtotime($ends)) {
+			return $this->modx->lexicon('msd_err_coupon_ends');
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Get discount from coupon
+	 *
+	 * @param $code
+	 * @param $price
+	 *
+	 * @return float|int
+	 */
+	public function getCouponDiscount($code, $price) {
+		$res = 0;
+		/** @var msdCoupon $coupon */
+		if ($coupon = $this->modx->getObject('msdCoupon', array('code' => $code))) {
+			if ($group = $coupon->getOne('Group')) {
+				$discount = $group->get('discount');
+				if (strpos($discount, '%') !== false) {
+					$res = $price * ((float)$discount / 100);
+				}
+				else {
+					$res = (float)$discount;
+				}
+			}
+		}
+
+		return $res > 0
+			? $res
+			: 0;
+	}
+
+
+	/**
 	 * Return array with groups of user
 	 *
 	 * @param int $id

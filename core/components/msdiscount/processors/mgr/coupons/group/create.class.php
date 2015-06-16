@@ -1,8 +1,8 @@
 <?php
 
-class msdSaleCreateProcessor extends modObjectCreateProcessor {
-	public $objectType = 'msdSale';
-	public $classKey = 'msdSale';
+class msdCouponGroupCreateProcessor extends modObjectCreateProcessor {
+	public $objectType = 'msdCouponGroup';
+	public $classKey = 'msdCouponGroup';
 	public $languageTopics = array('msdiscount');
 	public $permission = 'msdiscount_save';
 
@@ -18,9 +18,10 @@ class msdSaleCreateProcessor extends modObjectCreateProcessor {
 		}
 		$this->setProperties($properties);
 
-		$required = array('name');
+		$required = array('name', 'discount', 'coupons');
 		foreach ($required as $v) {
-			if ($this->getProperty($v) == '') {
+			$value = trim($this->getProperty($v));
+			if (empty($value) || $value == '0%') {
 				$this->modx->error->addField($v, $this->modx->lexicon('msd_err_ns'));
 			}
 		}
@@ -32,12 +33,17 @@ class msdSaleCreateProcessor extends modObjectCreateProcessor {
 			}
 		}
 
-		$active = $this->getProperty('active');
-		$this->setProperty('active', !empty($active) && $active != 'false');
+		$prefix = $this->getProperty('prefix');
+		if (!empty($prefix) && !preg_match('#[A-Z0-9]{5}#i', $prefix)) {
+			$this->modx->error->addField('prefix', $this->modx->lexicon('msd_err_prefix'));
+		}
+		else {
+			$this->setProperty('prefix', strtoupper($prefix));
+		}
 
 		return parent::beforeSet();
 	}
 
 }
 
-return 'msdSaleCreateProcessor';
+return 'msdCouponGroupCreateProcessor';

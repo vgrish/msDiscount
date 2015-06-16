@@ -68,10 +68,20 @@ class msdSaleMemberGetListProcessor extends modObjectGetListProcessor {
 
 		$array['actions'][] = array(
 			'cls' => '',
+			'icon' => "$icon $icon-exchange",
+			'title' => $this->modx->lexicon('msd_action_switch_mode'),
+			'multiple' => $this->modx->lexicon('msd_action_switch_mode'),
+			'action' => 'switchMember',
+			'button' => true,
+			'menu' => true,
+		);
+
+		$array['actions'][] = array(
+			'cls' => '',
 			'icon' => "$icon $icon-trash-o action-red",
 			'title' => $this->modx->lexicon('msd_action_remove'),
 			'multiple' => $this->modx->lexicon('msd_action_remove'),
-			'action' => 'removeGroup',
+			'action' => 'removeMember',
 			'button' => true,
 			'menu' => true,
 		);

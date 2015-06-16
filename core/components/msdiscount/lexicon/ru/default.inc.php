@@ -7,6 +7,8 @@ $_lang['msdiscount_menu_desc'] = 'Управление системой скид
 
 $_lang['msd_sales'] = 'Скидки и акции';
 $_lang['msd_sales_desc'] = 'Здесь вы создаёте акцию, указываете скидку и можете назначить группы товаров и пользователей, для которых она будет действовать.<br/>Если группы не указаны - скидка действует для всех.';
+$_lang['msd_coupons'] = 'Скидочные купоны';
+$_lang['msd_coupons_desc'] = 'Вы можете сгенерировать любое количество купонов с произвольной скидкой. Покупатели будут вводить код купона при оформлении заказа, чтобы получить скидку на всю корзину.';
 $_lang['msd_users'] = 'Группы пользователей';
 $_lang['msd_users_desc'] = 'Управление группами пользователей. Вы можете указать персональную скидку группы, которую получат все её пользователи.';
 $_lang['msd_products'] = 'Группы товаров';
@@ -18,23 +20,32 @@ $_lang['msd_clear'] = 'Очистить';
 
 $_lang['msd_btn_sale_create'] = 'Добавить акцию';
 $_lang['msd_btn_group_create'] = 'Создать группу';
+$_lang['msd_btn_coupon_create'] = 'Создать купоны';
 
 $_lang['msd_action_update'] = 'Изменить';
 $_lang['msd_action_disable'] = 'Отключить';
 $_lang['msd_action_enable'] = 'Включить';
+$_lang['msd_action_switch_mode'] = 'Переключить режим';
 $_lang['msd_action_remove'] = 'Удалить';
 $_lang['msd_action_remove_confirm'] = 'Вы уверены, что хотите удалить эту запись?';
+$_lang['msd_action_download_coupons'] = 'Скачать купоны';
 $_lang['msd_actions'] = 'Действия';
 
 $_lang['msd_err_ae'] = 'Это поле должно быть уникально';
 $_lang['msd_err_ns'] = 'Это поле обязательно для заполнения';
+$_lang['msd_err_prefix'] = 'Префикс должен состоять из 5 символов группы A-Z0-9';
+$_lang['msd_err_coupon_active'] = 'Этот код уже был активирован';
+$_lang['msd_err_coupon_code'] = 'Неправильный код скидки';
+$_lang['msd_err_coupon_begins'] = 'Срок действия этой скидки еще не наступил';
+$_lang['msd_err_coupon_ends'] = 'Срок действия этой скидки уже закончился';
+$_lang['msd_err_download_ids'] = 'Не указаны id групп скидок';
 
+$_lang['msd_sales_id'] = 'Id';
 $_lang['msd_sales_main'] = 'Основные свойства';
 $_lang['msd_sales_usergroups'] = 'Пользователи';
 $_lang['msd_sales_productgroups'] = 'Товары';
-$_lang['msd_sales_create'] = 'Новая скидка';
+$_lang['msd_sales_create'] = 'Новая акция';
 $_lang['msd_sales_update'] = 'Редактирование ';
-$_lang['msd_sales_id'] = 'Id';
 $_lang['msd_sales_discount'] = 'Скидка';
 $_lang['msd_sales_name'] = 'Название';
 $_lang['msd_sales_description'] = 'Описание';
@@ -43,6 +54,26 @@ $_lang['msd_sales_ends'] = 'Заканчивается';
 $_lang['msd_sales_active'] = 'Включена';
 $_lang['msd_sales_resource'] = 'Связана со страницей';
 $_lang['msd_sales_image'] = 'Изображение';
+
+$_lang['msd_coupons_id'] = 'Id';
+$_lang['msd_coupons_main'] = 'Группа купонов';
+$_lang['msd_coupons_create'] = 'Генерация купонов';
+$_lang['msd_coupons_view'] = 'Просмотр купонов';
+$_lang['msd_coupons_update'] = 'Редактирование купонов';
+$_lang['msd_coupons_name'] = 'Группа купонов';
+$_lang['msd_coupons_number'] = 'Количество';
+$_lang['msd_coupons_code'] = 'Код';
+$_lang['msd_coupons_discount'] = 'Скидка';
+$_lang['msd_coupons_begins'] = 'Начинаются';
+$_lang['msd_coupons_ends'] = 'Заканчиваются';
+$_lang['msd_coupons_active'] = 'Активен';
+$_lang['msd_coupons_activated'] = 'Активировано';
+$_lang['msd_coupons_coupons'] = 'Купоны';
+$_lang['msd_coupons_order'] = 'Заказ';
+$_lang['msd_coupons_createdon'] = 'Дата создания';
+$_lang['msd_coupons_activatedon'] = 'Дата активации';
+$_lang['msd_coupons_prefix'] = 'Префикс';
+$_lang['msd_coupons_form_desc'] = 'Укажите название для группы, срок действия, номинал и количество скидочных купонов.<br/>Группе можно указать уникальный префикс из 5 символов, чтобы отличать её купоны от других.';
 
 $_lang['msd_group_id'] = 'Id';
 $_lang['msd_group_name'] = 'Название';

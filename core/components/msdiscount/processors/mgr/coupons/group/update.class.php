@@ -1,8 +1,8 @@
 <?php
 
-class msdSaleCreateProcessor extends modObjectCreateProcessor {
-	public $objectType = 'msdSale';
-	public $classKey = 'msdSale';
+class msdCouponGroupUpdateProcessor extends modObjectUpdateProcessor {
+	public $objectType = 'msdCouponGroup';
+	public $classKey = 'msdCouponGroup';
 	public $languageTopics = array('msdiscount');
 	public $permission = 'msdiscount_save';
 
@@ -18,26 +18,30 @@ class msdSaleCreateProcessor extends modObjectCreateProcessor {
 		}
 		$this->setProperties($properties);
 
-		$required = array('name');
+		$required = array('name', 'discount');
 		foreach ($required as $v) {
-			if ($this->getProperty($v) == '') {
+			$value = trim($this->getProperty($v));
+			if (empty($value) || $value == '0%') {
 				$this->modx->error->addField($v, $this->modx->lexicon('msd_err_ns'));
 			}
 		}
 
 		$unique = array('name');
 		foreach ($unique as $v) {
-			if ($this->modx->getCount($this->classKey, array($v => $this->getProperty($v)))) {
+			if ($this->modx->getCount($this->classKey, array($v => $this->getProperty($v), 'id:!=' => $this->object->id))) {
 				$this->modx->error->addField($v, $this->modx->lexicon('msd_err_ae'));
 			}
 		}
 
-		$active = $this->getProperty('active');
-		$this->setProperty('active', !empty($active) && $active != 'false');
+		$coupons = $this->getProperty('coupons');
+		if ($coupons < $this->object->get('coupons')) {
+			$this->unsetProperty('coupons');
+		}
+		$this->unsetProperty('prefix');
 
 		return parent::beforeSet();
 	}
 
 }
 
-return 'msdSaleCreateProcessor';
+return 'msdCouponGroupUpdateProcessor';

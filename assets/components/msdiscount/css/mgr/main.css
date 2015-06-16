@@ -99,3 +99,7 @@ ul.msd-row-actions .btn {
 	min-width: 26px;
 	font-size: inherit;
 }
+
+.modx-tabs .x-item-disabled .x-tab-strip-text {
+	color: #efefef !important;
+}

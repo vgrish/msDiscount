@@ -3,7 +3,7 @@ msDiscount.page.Home = function(config) {
 	Ext.applyIf(config, {
 		components: [{
 			xtype: 'msd-panel-home',
-			renderTo: 'msd-panel-home-div'
+			renderTo: 'msd-panel-home-div',
 		}]
 	});
 	msDiscount.page.Home.superclass.constructor.call(this, config);
@@ -15,9 +15,7 @@ msDiscount.panel.Home = function(config) {
 	config = config || {};
 	Ext.apply(config,{
 		border: false,
-		deferredRender: true,
 		baseCls: 'modx-formpanel',
-		layout: 'anchor',
 		items: [{
 			html: '<h2>' + _('msdiscount') + '</h2>',
 			border: false,
@@ -35,6 +33,7 @@ msDiscount.panel.Home = function(config) {
 			cls: MODx.modx23 ? 'modx23' : 'modx22',
 			items: [{
 				title: _('msd_sales'),
+				layout: 'anchor',
 				deferredRender: true,
 				items: [{
 					html: '<p>' + _('msd_sales_desc') + '</p>',
@@ -45,7 +44,20 @@ msDiscount.panel.Home = function(config) {
 					cls: 'main-wrapper',
 				}]
 			},{
+				title: _('msd_coupons'),
+				layout: 'anchor',
+				deferredRender: true,
+				items: [{
+					html: '<p>' + _('msd_coupons_desc') + '</p>',
+					border: false,
+					bodyCssClass: 'panel-desc',
+				},{
+					xtype: 'msd-grid-coupons-groups',
+					cls: 'main-wrapper',
+				}]
+			},{
 				title: _('msd_users'),
+				layout: 'anchor',
 				deferredRender: true,
 				items: [{
 					html: '<p>' + _('msd_users_desc') + '</p>',
@@ -57,6 +69,7 @@ msDiscount.panel.Home = function(config) {
 				}]
 			},{
 				title: _('msd_products'),
+				layout: 'anchor',
 				deferredRender: true,
 				items: [{
 					html: '<p>' + _('msd_products_desc') + '</p>',
@@ -68,6 +81,7 @@ msDiscount.panel.Home = function(config) {
 				}]
 			},{
 				title: _('msd_check'),
+				layout: 'anchor',
 				deferredRender: true,
 				items: [{
 					html: '<p>' + _('msd_check_desc') + '</p>',

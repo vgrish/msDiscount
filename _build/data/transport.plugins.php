@@ -9,6 +9,9 @@ $tmp = array(
 		'events' => array(
 			'msOnGetProductPrice' => array(),
 			'msOnChangeOrderStatus' => array('priority' => 10),
+			'msOnBeforeAddToOrder' => array(),
+			'msOnGetOrderCost' => array('priority' => 10),
+			'msOnCreateOrder' => array(),
 			'OnWebLogin' => array(),
 			'OnWebLogout' => array(),
 			'OnLoadWebDocument' => array(),
