@@ -1,5 +1,10 @@
 Changelog for msDiscount.
 
+1.1.1-pl
+==============
+- Support of MS2 multi-categories.
+- Price after discount can`t be less that 0.
+
 1.1.0-pl
 ==============
 - Ability to add discounts for product category.

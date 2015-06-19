@@ -220,6 +220,9 @@ class msDiscount {
 				? $this->absolute
 				: $this->percent;
 			$price -= $discount;
+			if ($price < 0) {
+				$price = 0;
+			}
 
 			$this->debugMessage('msd_dbg_discount_total', array('price' => $price, 'discount' => $discount));
 		}
@@ -364,11 +367,24 @@ class msDiscount {
 		if ($product = $this->modx->getObject('msProduct', $id)) {
 			$ids = $this->modx->getParentIds($id, 10, array('context' => $product->get('context_key')));
 			$ids[] = $id;
-			$where = array('document:IN' => $ids);
 		}
 		else {
-			$where = array('document' => $id);
+			$ids = array($id);
 		}
+		$q = $this->modx->newQuery('msCategoryMember', array('product_id' => $id));
+		$q->select('category_id');
+		$tstart = microtime(true);
+		if ($q->prepare() && $q->stmt->execute()) {
+			$this->modx->queryTime += microtime(true) - $tstart;
+			$this->modx->executedQueries++;
+			if ($tmp = $q->stmt->fetchAll(PDO::FETCH_COLUMN)) {
+				$ids = array_merge($ids, $tmp);
+			}
+		}
+		$ids = array_unique($ids);
+		$where = count($ids) > 1
+			? array('document:IN' => $ids)
+			: array('document' => $ids[0]);
 
 		$q = $this->modx->newQuery('modResourceGroupResource', $where);
 		$q->leftJoin('msdProductGroup', 'msdProductGroup', 'msdProductGroup.id = modResourceGroupResource.document_group');
