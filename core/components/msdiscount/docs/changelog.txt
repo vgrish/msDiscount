@@ -4,6 +4,7 @@ Changelog for msDiscount.
 ==============
 - Support of MS2 multi-categories.
 - Price after discount can`t be less that 0.
+- Added parameters &frontend_js and &frontend_css to snippet msdBuyNow.
 
 1.1.0-pl
 ==============

@@ -6,3 +6,5 @@ $_lang['msdiscount_prop_sortBy'] = 'The field to sort by.';
 $_lang['msdiscount_prop_sortDir'] = 'The direction to sort by.';
 $_lang['msdiscount_prop_tpl'] = 'The chunk to use for each row of Items.';
 $_lang['msdiscount_prop_toPlaceholder'] = 'If set, will output the content to the placeholder specified in this property, rather than outputting the content directly.';
+$_lang['msdiscount_prop_frontend_css'] = 'File with css styles for frontend.';
+$_lang['msdiscount_prop_frontend_js'] = 'File with javascript for frontend.';
