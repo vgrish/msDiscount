@@ -15,7 +15,7 @@ if (!empty($frontend_js)) {
 
 $date = date('Y-m-d H:i:s');
 $pdoTools->setStore('msd_date', $date);
-$usergroups = array_keys($msDiscount->getUserGroups());
+$usergroups = array_keys($msDiscount->getUserGroups($modx->user->id));
 $sales = $msDiscount->getSales($date, true);
 if (!empty($sale)) {
 	$pdoTools->setStore('msd_sale', $sale);
@@ -28,7 +28,7 @@ if (!empty($sale)) {
 }
 if (empty($sales)) {
 	return !empty($showLog) && $modx->user->hasSessionContext('mgr')
-		? 'There is no sales'
+		? $modx->lexicon('msd_err_no_sales')
 		: '';
 }
 $all = false;
@@ -77,6 +77,12 @@ foreach ($sales as $idx => $sale) {
 		$all = true;
 		break;
 	}
+}
+
+if (!$parents_in && !$parents_out && !$all) {
+	return !empty($showLog) && $modx->user->hasSessionContext('mgr')
+		? $modx->lexicon('msd_err_no_sales')
+		: '';
 }
 
 if (empty($scriptProperties['prepareSnippet'])) {

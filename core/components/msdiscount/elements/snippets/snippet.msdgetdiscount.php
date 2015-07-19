@@ -4,6 +4,7 @@
 $pdoTools = $modx->getService('pdoTools');
 $msDiscount = $modx->getService('msDiscount');
 $date = $pdoTools->getStore('msd_date');
+$usergroups = array_keys($msDiscount->getUserGroups($modx->user->id));
 $sales = !empty($date)
 	? $msDiscount->getSales($date, true)
 	: $msDiscount->getSales();
@@ -18,7 +19,7 @@ if (!empty($sale)) {
 		}
 	}
 }
-if (isset($row) && is_array($row)) {
+if (!empty($row) && is_array($row)) {
 	$mode = 'prepare';
 	if (!empty($row['id'])) {
 		$id = $row['id'];
@@ -41,56 +42,92 @@ else {
 
 $remains = $discount = 0;
 if (!empty($id) && !empty($sales)) {
-	$groups = array();
-	$ids = $modx->getParentIds($id);
-	$ids[] = $id;
-
-	$q = $modx->newQuery('msCategoryMember', array('product_id' => $id));
-	$q->select('category_id');
-	$tstart = microtime(true);
-	if ($q->prepare() && $q->stmt->execute()) {
-		$modx->queryTime += microtime(true) - $tstart;
-		$modx->executedQueries++;
-		if ($tmp = $q->stmt->fetchAll(PDO::FETCH_COLUMN)) {
-			$ids = array_merge($ids, $tmp);
-		}
-	}
-	$ids = array_unique($ids);
-	$where = count($ids) > 1
-		? array('document:IN' => $ids)
-		: array('document' => $ids[0]);
-
-	$q = $modx->newQuery('modResourceGroupResource', $where);
-	$q->select('document_group');
-	$tstart = microtime(true);
-
-	if ($q->prepare() && $q->stmt->execute()) {
-		$modx->queryTime += microtime(true) - $tstart;
-		$modx->executedQueries++;
-		while ($group = $q->stmt->fetchColumn()) {
-			foreach ($sales as $sale) {
-				if (empty($sale['products']) || isset($sale['products'][$group])) {
-					$tmp_remains = ($sale['ends'] != '0000-00-00 00:00:00')
-						? strtotime($sale['ends']) - time()
-						: 0;
-					if (strpos($sale['discount'], '%') !== false && (empty($discount) || strpos($discount, '%') !== false)) {
-						if ($sale['discount'] > $discount) {
-							$discount = $sale['discount'];
-							$remains = $tmp_remains;
-						}
-					}
-					elseif (is_numeric($sale['discount']) && is_numeric($discount)) {
-						if ($sale['discount'] > $discount) {
-							$discount = $sale['discount'];
-							$remains = $tmp_remains;
-						}
-					}
-					else {
-						$discount = $sale['discount'];
-						$remains = $tmp_remains;
-					}
+	foreach ($sales as $sale) {
+		// Check user groups
+		if (!empty($sale['users'])) {
+			$required = array();
+			foreach ($sale['users'] as $gid => $type) {
+				if ($type == 'out' && in_array($gid, $usergroups)) {
+					unset($sales[$idx]);
+					continue(2);
+				}
+				if ($type == 'in') {
+					$required[] = $gid;
 				}
 			}
+			if (!empty($required) && !array_intersect($required, $usergroups)) {
+				unset($sales[$idx]);
+				continue;
+			}
+		}
+		// Check product groups
+		if (!empty($sale['products'])) {
+			$groups_in = $groups_out = array();
+			foreach ($sale['products'] as $gid => $type) {
+				if ($type == 'out') {
+					$groups_out[] = $gid;
+					unset($sale['products'][$gid]);
+				}
+				else {
+					$groups_in[] = $gid;
+				}
+			}
+		}
+
+		if (!empty($groups_out) || !empty($groups_in)) {
+			$ids = $modx->getParentIds($id);
+			$ids[] = $id;
+
+			$q = $modx->newQuery('msCategoryMember', array('product_id' => $id));
+			$q->select('category_id');
+			$tstart = microtime(true);
+			if ($q->prepare() && $q->stmt->execute()) {
+				$modx->queryTime += microtime(true) - $tstart;
+				$modx->executedQueries++;
+				if ($tmp = $q->stmt->fetchAll(PDO::FETCH_COLUMN)) {
+					$ids = array_merge($ids, $tmp);
+				}
+			}
+			$ids = array_unique($ids);
+			$where = count($ids) > 1
+				? array('document:IN' => $ids)
+				: array('document' => $ids[0]);
+
+			$q = $modx->newQuery('modResourceGroupResource', $where);
+			$q->select('document_group');
+			$tstart = microtime(true);
+			if ($q->prepare() && $q->stmt->execute()) {
+				$modx->queryTime += microtime(true) - $tstart;
+				$modx->executedQueries++;
+				$groups = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
+				if (!empty($groups_out) && array_intersect($groups_out, $groups)) {
+					continue;
+				}
+				elseif (!empty($groups_in) && !array_intersect($groups_in, $groups)) {
+					continue;
+				}
+			}
+		}
+
+		// Product match
+		$tmp_remains = ($sale['ends'] != '0000-00-00 00:00:00')
+			? strtotime($sale['ends']) - time()
+			: 0;
+		if (strpos($sale['discount'], '%') !== false && (empty($discount) || strpos($discount, '%') !== false)) {
+			if ($sale['discount'] > $discount) {
+				$discount = $sale['discount'];
+				$remains = $tmp_remains;
+			}
+		}
+		elseif (is_numeric($sale['discount']) && is_numeric($discount)) {
+			if ($sale['discount'] > $discount) {
+				$discount = $sale['discount'];
+				$remains = $tmp_remains;
+			}
+		}
+		else {
+			$discount = $sale['discount'];
+			$remains = $tmp_remains;
 		}
 	}
 }

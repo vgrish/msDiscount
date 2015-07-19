@@ -127,3 +127,5 @@ $_lang['msd_dbg_discount_total'] = "Итоговая скидка <b>[[+discount
 $_lang['msd_dbg_discount_less'] = "	Пропускаем скидку <b>[[+discount]]</b>, так как она меньше или равна текущей.";
 $_lang['msd_dbg_discount_no'] = 'Скидки нет, возвращаем начальную цену <b>[[+price]]</b>.';
 $_lang['msd_dbg_time'] = "\nЗатрачено времени: <b>[[+time]]</b> <small>сек.</small>";
+
+$_lang['msd_err_no_sales'] = "Нет товаров, подходящих под условия акций.";

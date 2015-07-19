@@ -1,6 +1,6 @@
 Changelog for msDiscount.
 
-1.1.2-pl
+1.1.3-pl
 ==============
 - Completely rewritten snippet "msdBuyNow".
 - New prepare snippet "msdGetSale" for msProducts.

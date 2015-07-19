@@ -127,3 +127,5 @@ $_lang['msd_dbg_discount_total'] = "The resulting discount <b>[[+discount]]</b>\
 $_lang['msd_dbg_discount_less'] = "Skip discount <b>[[+discount]]</b> because it is smaller than the current.";
 $_lang['msd_dbg_discount_no'] = 'No discounts, return the original price of the <b>[[+price]]</b>.';
 $_lang['msd_dbg_time'] = "\nSpent time: <b>[[+time]]</b> <small>s.</small>";
+
+$_lang['msd_err_no_sales'] = "There is no suitable products in current actions.";
