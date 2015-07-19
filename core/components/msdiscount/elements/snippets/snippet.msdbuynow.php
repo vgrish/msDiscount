@@ -1,14 +1,7 @@
 <?php
-if (empty($tpl)) $tpl = "tpl.msProducts.row";
-if (empty($limit)) $limit = 10;
-if (empty($offset)) $offset = 0;
-if (empty($sortby)) $sortby = "id";
-if (empty($sortdir)) $sortdir = "ASC";
-if (empty($showHidden)) $showHidden = true;
-if (empty($outputSeparator)) $outputSeparator = "\n";
-
-/** @var miniShop2 $miniShop2 */
-$miniShop2 = $modx->getService('miniShop2');
+/** @var array $scriptProperties */
+/** @var pdoTools $pdoTools */
+$pdoTools = $modx->getService('pdoTools');
 /** @var msDiscount $msDiscount */
 $msDiscount = $modx->getService('msDiscount');
 if (!empty($frontend_css)) {
@@ -20,88 +13,155 @@ if (!empty($frontend_js)) {
 	$modx->regClientScript($frontend_js);
 }
 
-$q = $modx->newQuery('modUserGroupMember', array('member' => $modx->user->id));
-$q->select('user_group');
-$groups = array();
-if ($q->prepare() && $q->stmt->execute()) {
-	while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-		$groups[] = $row['user_group'];
-	}
-}
-
-$q = $modx->newQuery('msdSale');
+$date = date('Y-m-d H:i:s');
+$pdoTools->setStore('msd_date', $date);
+$usergroups = array_keys($msDiscount->getUserGroups());
+$sales = $msDiscount->getSales($date, true);
 if (!empty($sale)) {
-	$q->where(array('`msdSale`.`id`:IN' => explode(',', $sale)));
-}
-$q->where(array(
-	'now() between `msdSale`.`begins` and `msdSale`.`ends`'
-));
-if (!empty($where)) {
-	$tmp = array();
-	foreach ($modx->fromJSON($where) as $key => $val) {
-		$tmp['`modResource`.`' . $key . '`'] = $val;
+	$pdoTools->setStore('msd_sale', $sale);
+	$tmp = array_map('trim', explode(',', $sale));
+	foreach ($sales as $id => $sale) {
+		if (!in_array($id, $tmp)) {
+			unset($sales[$id]);
+		}
 	}
-	$q->where($tmp);
 }
-$q->select(array('`modResourceGroupResource`.`document`', '`msdSaleUserGroups`.`group_id`', '`msdSale`.`active`', '`modResourceGroup`.`id` AS `group_id`'));
-$q->select(array(
-	'`msdSale`.`id` AS `sale_id`, `msdSale`.`discount` AS `sale_discount`, `msdSale`.`name` AS `sale_name`,
-    `msdSale`.`description` AS `sale_description`, `msdSale`.`begins` AS `sale_begins`, `msdSale`.`ends` AS `sale_ends`,
-    `msdSale`.`active` AS `sale_active`, `msdSale`.`resource` AS `sale_resource`, `msdSale`.`image` AS `sale_image`'
-));
-$q->select(array($modx->getSelectColumns('msProductData', 'Data')));
-$q->select(array($modx->getSelectColumns('msVendor', 'Vendor')));
-$q->select(array($modx->getSelectColumns('modResource', 'modResource')));
-$q->rightJoin('msdSaleMember', 'msdSaleResourceGroups', array('`msdSaleResourceGroups`.`sale_id` = `msdSale`.`id` AND `msdSaleResourceGroups`.`type` = "products"'));
-$q->leftJoin('msdSaleMember', 'msdSaleUserGroups', array('`msdSaleUserGroups`.`sale_id` = `msdSale`.`id` AND `msdSaleUserGroups`.`type` = "users"'));
-$q->rightJoin('modResourceGroup', 'modResourceGroup', array('`modResourceGroup`.`id` = `msdSaleResourceGroups`.`group_id`'));
-$q->rightJoin('modResourceGroupResource', 'modResourceGroupResource', array('`modResourceGroup`.`id` = `modResourceGroupResource`.`document_group`'));
-$q->leftJoin('modResource', 'modResource', array('`modResource`.`id` = `modResourceGroupResource`.`document`'));
-$q->leftJoin('msProductData', 'Data', array('`modResource`.`id` = `Data`.`id`'));
-$q->leftJoin('msVendor', 'Vendor', array('`Vendor`.`id` = `Data`.`vendor`'));
-$q->sortby("`modResource`.`$sortby`", $sortdir);
-$q->limit($limit, $offset);
-$q->sortby('MAX(`msdSale`.`discount`)', 'DESC');
-if ($groups) {
-	$q->groupby('`modResourceGroupResource`.`document` HAVING (`msdSaleUserGroups`.`group_id` IS NULL OR `msdSaleUserGroups`.`group_id` IN (' . implode(',', $groups) . ')) AND `msdSale`.`active` = 1');
+if (empty($sales)) {
+	return !empty($showLog) && $modx->user->hasSessionContext('mgr')
+		? 'There is no sales'
+		: '';
 }
-else {
-	$q->groupby('`modResourceGroupResource`.`document` HAVING `msdSaleUserGroups`.`group_id` IS NULL AND `msdSale`.`active` = 1');
-}
-
-$timezone = $modx->getOption('date_timezone');
-if (!$timezone) $timezone = 'Europe/Moscow';
-date_default_timezone_set($timezone);
-$output = array();
-if ($q->prepare() && $q->stmt->execute()) {
-	if (!$modx->getObject('modChunk', array('name' => $tpl))) {
-		$outType = 'array';
+$all = false;
+$parents_in = array();
+$parents_out = array();
+foreach ($sales as $idx => $sale) {
+	// Check user groups
+	if (!empty($sale['users'])) {
+		$required = array();
+		foreach ($sale['users'] as $gid => $type) {
+			if ($type == 'out' && in_array($gid, $usergroups)) {
+				unset($sales[$idx]);
+				continue(2);
+			}
+			if ($type == 'in') {
+				$required[] = $gid;
+			}
+		}
+		if (!empty($required) && !array_intersect($required, $usergroups)) {
+			unset($sales[$idx]);
+			continue;
+		}
 	}
-	while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-		if ($row['old_price'] == 0) {
-			$row['old_price'] = $miniShop2->formatPrice($row['price']);
+	// Check product groups
+	if (!empty($sale['products'])) {
+		foreach ($sale['products'] as $gid => $type) {
+			$c = $modx->newQuery('modResourceGroupResource', array('document_group' => $gid));
+			$c->select('document');
+			$tstart = microtime(true);
+			if ($c->prepare() && $c->stmt->execute()) {
+				$this->modx->queryTime += microtime(true) - $tstart;
+				$this->modx->executedQueries++;
+				if ($ids = $c->stmt->fetchAll(PDO::FETCH_COLUMN)) {
+					if ($type == 'in') {
+						$parents_in = array_merge($parents_in, $ids);
+					}
+					else {
+						$parents_out = array_merge($parents_out, $ids);
+					}
+				}
+			}
 		}
-		if (strpos($row['sale_discount'], '%') !== false) {
-			$row['price'] = $miniShop2->formatPrice($row['price'] - $row['price'] * $row['sale_discount'] / 100);
-		}
-		else {
-			$row['price'] = $miniShop2->formatPrice($row['price'] - $row['sale_discount']);
-		}
-		$row['remains'] = strtotime($row['sale_ends']) - time();
-		if ($outType == 'array') {
-			$output[] = $row;
-		}
-		else {
-			$output[] = $modx->getChunk($tpl, $row);
-		}
+	}
+	// All products
+	else {
+		$all = true;
+		break;
 	}
 }
 
-if ($outType == 'array') {
-	print "<pre>";
-	print_r($output);
-	print "</pre>";
+if (empty($scriptProperties['prepareSnippet'])) {
+	$scriptProperties['prepareSnippet'] = 'msdGetDiscount';
+}
+
+$scriptProperties['parents'] = 0;
+if (!empty($scriptProperties['where'])) {
+	$where = !is_array($scriptProperties['where'])
+		? $modx->fromJSON($scriptProperties['where'])
+		: $scriptProperties['where'];
 }
 else {
-	return implode($outputSeparator, $output);
+	$where = array();
 }
+if (!$all) {
+	$depth = (isset($config['depth']) && $config['depth'] !== '')
+		? (integer)$config['depth']
+		: 10;
+	if (!empty($depth) && $depth > 0) {
+		$pids = array();
+		$q = $modx->newQuery($class, array('id:IN' => array_merge($parents_in, $parents_out)));
+		$q->select('id,context_key');
+		$tstart = microtime(true);
+		if ($q->prepare() && $q->stmt->execute()) {
+			$this->modx->queryTime += microtime(true) - $tstart;
+			$this->modx->executedQueries++;
+			while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+				$pids[$row['id']] = $row['context_key'];
+			}
+		}
+		foreach ($pids as $k => $v) {
+			if (!is_numeric($k)) {
+				continue;
+			}
+			elseif (in_array($k, $parents_in)) {
+				$parents_in = array_merge($parents_in, $modx->getChildIds($k, $depth, array('context' => $v)));
+			}
+			else {
+				$parents_out = array_merge($parents_out, $modx->getChildIds($k, $depth, array('context' => $v)));
+			}
+		}
+		if (empty($parents_in)) {
+			$parents_in = $modx->getChildIds(0, $depth, array('context' => $this->config['context']));
+		}
+		// Support of miniShop2 categories
+		$members = array();
+		if (!empty($parents_in) || !empty($parents_out)) {
+			$q = $modx->newQuery('msCategoryMember');
+			if (!empty($parents_in)) {
+				$q->where(array('category_id:IN' => $parents_in));
+			}
+			if (!empty($parents_out)) {
+				$q->where(array('category_id:NOT IN' => $parents_out));
+			}
+			$q->select('product_id');
+			$tstart = microtime(true);
+			if ($q->prepare() && $q->stmt->execute()) {
+				$this->modx->queryTime += microtime(true) - $tstart;
+				$this->modx->executedQueries++;
+				$members = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
+			}
+		}
+		// Add parent to conditions
+		if (!empty($parents_in) && !empty($members)) {
+			$members = array_merge($members, $parents_in);
+			$where[] = array(
+				'parent:IN' => $parents_in,
+				'OR:id:IN' => $members,
+			);
+		}
+		elseif (!empty($parents_in)) {
+			$where[] = array(
+				'parent:IN' => $parents_in,
+				'OR:id:IN' => $parents_in,
+			);
+		}
+		if (!empty($parents_out)) {
+			$where[] = array(
+				'parent:NOT IN' => $parents_out,
+				'AND:id:NOT IN' => $parents_out,
+			);
+		}
+	}
+}
+$scriptProperties['where'] = $modx->toJSON($where);
+
+return $modx->runSnippet('msProducts', $scriptProperties);

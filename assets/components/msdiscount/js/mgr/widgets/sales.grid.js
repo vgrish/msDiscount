@@ -80,7 +80,7 @@ Ext.extend(msDiscount.grid.Sales,MODx.grid.Grid,{
 
 	getColumns: function(config) {
 		var columns = {
-			id: {hidden: true, width: 50},
+			id: {width: 35},
 			name: {width: 100},
 			discount: {width: 75},
 			description: {hidden: true},

@@ -1,10 +1,7 @@
 <?php
 
-$_lang['msdiscount_prop_limit'] = 'The number of Items to limit per page.';
-$_lang['msdiscount_prop_outputSeparator'] = 'A string to separate each row with.';
-$_lang['msdiscount_prop_sortBy'] = 'The field to sort by.';
-$_lang['msdiscount_prop_sortDir'] = 'The direction to sort by.';
-$_lang['msdiscount_prop_tpl'] = 'The chunk to use for each row of Items.';
-$_lang['msdiscount_prop_toPlaceholder'] = 'If set, will output the content to the placeholder specified in this property, rather than outputting the content directly.';
-$_lang['msdiscount_prop_frontend_css'] = 'File with css styles for frontend.';
-$_lang['msdiscount_prop_frontend_js'] = 'File with javascript for frontend.';
+$_lang['msdiscount_prop_id'] = 'An id of product';
+$_lang['msdiscount_prop_sale'] = 'Comma-separated list of sales to output.';
+$_lang['msdiscount_prop_tpl'] = 'Chunk for output result of snippets work.';
+$_lang['msdiscount_prop_frontend_css'] = 'A css file for the frontend.';
+$_lang['msdiscount_prop_frontend_js'] = 'A javascript file for the frontend.';

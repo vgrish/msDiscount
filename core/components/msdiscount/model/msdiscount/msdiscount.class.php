@@ -77,6 +77,7 @@ class msDiscount {
 				}
 				break;
 		}
+
 		return $value;
 	}
 
@@ -226,8 +227,8 @@ class msDiscount {
 
 			$this->debugMessage('msd_dbg_discount_total', array('price' => $price, 'discount' => $discount));
 		}
-
 		$this->debugMessage('msd_dbg_time', array('time' => number_format(round(microtime(true) - $time, 4), 4)));
+
 		return $price;
 	}
 
@@ -345,8 +346,8 @@ class msDiscount {
 				}
 			}
 		}
-
 		$this->cache['users'][$id] = $groups;
+
 		return $groups;
 	}
 
@@ -399,8 +400,8 @@ class msDiscount {
 				$groups[$row['document_group']] = $row['discount'];
 			}
 		}
-
 		$this->cache['products'][$id] = $groups;
+
 		return $groups;
 	}
 
@@ -409,10 +410,11 @@ class msDiscount {
 	 * Return array with current active sales
 	 *
 	 * @param string $date
+	 * @param bool $force_date
 	 *
 	 * @return array
 	 */
-	public function getSales($date = '') {
+	public function getSales($date = '', $force_date = false) {
 		$groups = array();
 		if (empty($date)) {
 			$date = date('Y-m-d H:i:s');
@@ -427,23 +429,36 @@ class msDiscount {
 
 		$q = $this->modx->newQuery('msdSale', array('active' => 1));
 		$q->leftJoin('msdSaleMember', 'msdSaleMember', 'msdSaleMember.sale_id = msdSale.id');
-		$q->orCondition(array(
-			'begins:=' => '0000-00-00 00:00:00',
-			'begins:<=' => $date,
-		), '', 1);
-		$q->orCondition(array(
-			'ends:=' => '0000-00-00 00:00:00',
-			'ends:>=' => $date,
-		), '', 2);
+		if ($force_date) {
+			$q->andCondition(array(
+				'begins:<=' => $date,
+				'ends:>=' => $date,
+			));
+		}
+		else {
+			$q->orCondition(array(
+				'begins:=' => '0000-00-00 00:00:00',
+				'begins:<=' => $date,
+			), '', 1);
+			$q->orCondition(array(
+				'ends:=' => '0000-00-00 00:00:00',
+				'ends:>=' => $date,
+			), '', 2);
+		}
 
-		$q->select('id,discount,name,group_id,type,relation');
+		$q->select('id,discount,name,begins,ends,group_id,type,relation');
+		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
+			$this->modx->queryTime = microtime(true) - $tstart;
+			$this->modx->executedQueries++;
 			while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
 				if (!isset($groups[$row['id']])) {
 					$groups[$row['id']] = array(
 						'id' => $row['id'],
 						'discount' => $row['discount'],
 						'name' => $row['name'],
+						'begins' => $row['begins'],
+						'ends' => $row['ends'],
 						'users' => array(),
 						'products' => array(),
 					);
@@ -454,6 +469,7 @@ class msDiscount {
 			}
 		}
 		$this->cache['sales'][$date] = $groups;
+
 		return $groups;
 	}
 

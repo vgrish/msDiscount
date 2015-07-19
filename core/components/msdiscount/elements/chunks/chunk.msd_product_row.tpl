@@ -3,9 +3,9 @@
 	<div class="row span10 col-md-10">
 		<form method="post" class="ms2_form">
 			<a href="[[~[[+id]]]]">[[+pagetitle]]</a>
-			<span class="flags">[[+new:eq=`0`:then=``:else=`<i class="glyphicon glyphicon-flag" title="[[%ms2_frontend_new]]"></i>`]] [[+popular:eq=`0`:then=``:else=`<i class="glyphicon glyphicon-star" title="[[%ms2_frontend_popular]]"></i>`]] [[+favorite:eq=`0`:then=``:else=`<i class="glyphicon glyphicon-bookmark" title="[[%ms2_frontend_favorite]]"></i>`]]</span>
-			<span class="price">[[+price]] [[%ms2_frontend_currency]] (-[[+sale_discount]] — <span class="msd_remains">[[+remains]]</span>)</span>
-			[[+old_price:eq=`0`:then=``:else=`<span class="old_price">[[+old_price]] [[%ms2_frontend_currency]]</span>`]]
+			<span class="flags">[[+new]] [[+popular]] [[+favorite]]</span>
+			<span class="price">[[+price]] [[%ms2_frontend_currency]][[+remains]]</span>
+			[[+old_price]]
 			<button class="btn btn-default" type="submit" name="ms2_action" value="cart/add"><i class="glyphicon glyphicon-barcode"></i> [[%ms2_frontend_add_to_cart]]</button>
 			<input type="hidden" name="id" value="[[+id]]">
 			<input type="hidden" name="count" value="1">
@@ -15,3 +15,9 @@
 	</div>
 </div>
 <br/><br/>
+<!--minishop2_popular <i class="glyphicon glyphicon-star" title="[[%ms2_frontend_popular]]"></i>-->
+<!--minishop2_new <i class="glyphicon glyphicon-flag" title="[[%ms2_frontend_new]]"></i>-->
+<!--minishop2_favorite <i class="glyphicon glyphicon-bookmark" title="[[%ms2_frontend_favorite]]"></i>-->
+<!--minishop2_old_price <span class="old_price">[[+old_price]] [[%ms2_frontend_currency]]</span>-->
+<!--minishop2_remains  (-[[+sale_discount]] — <span class="msd_remains">[[+remains]]</span>)-->
+<!--minishop2_!remains  (-[[+sale_discount]])-->

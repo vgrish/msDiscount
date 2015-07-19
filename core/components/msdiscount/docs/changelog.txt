@@ -1,5 +1,10 @@
 Changelog for msDiscount.
 
+1.1.2-pl
+==============
+- Completely rewritten snippet "msdBuyNow".
+- New prepare snippet "msdGetSale" for msProducts.
+
 1.1.1-pl
 ==============
 - Support of MS2 multi-categories.

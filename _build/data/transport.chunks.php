@@ -3,14 +3,12 @@
 $chunks = array();
 
 $tmp = array(
-	/*
-	'tpl.msDiscount.item' => array(
-		'file' => 'item',
+	'tpl.msProducts.discount.row' => array(
+		'file' => 'msd_product_row',
 		'description' => '',
 	),
-	*/
-    'tpl.msProducts.discount.row' => array(
-		'file' => 'msd_product_row',
+	'tpl.msProduct.discount' => array(
+		'file' => 'msd_discount',
 		'description' => '',
 	),
 );

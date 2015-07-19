@@ -3,13 +3,17 @@
 $properties = array();
 
 $tmp = array(
+	'id' => array(
+		'type' => 'numberfield',
+		'value' => '',
+	),
 	'sale' => array(
 		'type' => 'textfield',
 		'value' => '',
 	),
 	'tpl' => array(
 		'type' => 'textfield',
-		'value' => 'tpl.msProducts.discount.row',
+		'value' => 'tpl.msProduct.discount',
 	),
 	'frontend_css' => array(
 		'type' => 'textfield',

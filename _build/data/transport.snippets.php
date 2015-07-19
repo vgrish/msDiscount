@@ -3,15 +3,12 @@
 $snippets = array();
 
 $tmp = array(
-	/*
-	'msDiscount' => array(
-		'file' => 'msdiscount',
-		'description' => '',
-	),
-	*/
-
 	'msdBuyNow' => array(
 		'file' => 'msdbuynow',
+		'description' => '',
+	),
+	'msdGetDiscount' => array(
+		'file' => 'msdgetdiscount',
 		'description' => '',
 	),
 
