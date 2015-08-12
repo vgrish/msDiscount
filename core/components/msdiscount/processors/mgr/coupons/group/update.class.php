@@ -13,6 +13,7 @@ class msdCouponGroupUpdateProcessor extends modObjectUpdateProcessor {
 		$msDiscount = $this->modx->getService('msDiscount');
 
 		$properties = $this->getProperties();
+		unset($properties['actions']);
 		foreach ($properties as $k => $v) {
 			$properties[$k] = $msDiscount->sanitize($k, $v);
 		}

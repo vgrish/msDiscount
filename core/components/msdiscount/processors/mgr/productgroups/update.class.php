@@ -28,6 +28,7 @@ class msdProductGroupUpdateProcessor extends modObjectUpdateProcessor {
 	/** {inheritDoc} */
 	public function beforeSet() {
 		$properties = $this->getProperties();
+		unset($properties['actions']);
 		foreach ($properties as $k => $v) {
 			$properties[$k] = $this->modx->msDiscount->sanitize($k, $v);
 		}

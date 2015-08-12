@@ -27,6 +27,10 @@ class msdSaleMemberGetListProcessor extends modObjectGetListProcessor {
 				$this->linkedKey1 = 'msdProductGroup';
 				$this->linkedKey2 = 'modResourceGroup';
 				break;
+			case 'vendors':
+				$this->linkedKey1 = 'msdProductVendorsGroup';
+				$this->linkedKey2 = 'msVendor';
+				break;
 		}
 
 		return parent::initialize();

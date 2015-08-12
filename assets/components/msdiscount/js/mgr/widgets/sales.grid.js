@@ -166,6 +166,9 @@ Ext.extend(msDiscount.grid.Sales,MODx.grid.Grid,{
 									Ext.getCmp(this.config.id + '-tabs').setActiveTab(tab);
 								}
 							}},
+							failure: {fn: function() {
+								console.log('failure');
+							}, scope: this}
 						}
 					});
 					w.fp.getForm().reset();
@@ -272,10 +275,10 @@ Ext.extend(msDiscount.window.Sale, MODx.Window, {
 			border: true,
 			activeTab: 0,
 			autoHeight: true,
-			stateful: true,
-			stateId: 'msd-window-sales-' + config['mode'],
+			stateful: false,
+			/*stateId: 'msd-window-sales-' + config['mode'],
 			stateEvents: ['tabchange'],
-			getState:function() {return {activeTab: this.items.indexOf(this.getActiveTab())};},
+			getState:function() {return {activeTab: this.items.indexOf(this.getActiveTab())};},*/
 			items: [{
 				title: _('msd_sales_main'),
 				layout: 'form',
@@ -298,6 +301,16 @@ Ext.extend(msDiscount.window.Sale, MODx.Window, {
 					xtype: 'msd-grid-sales-group',
 					record: config.record,
 					type: 'products',
+					sale_id: config.record.id
+				}
+			},{
+				title: _('msd_product_vendors'),
+				disabled: config['mode'] == 'create',
+				layout: 'anchor',
+				items: {
+					xtype: 'msd-grid-sales-group',
+					record: config.record,
+					type: 'vendors',
 					sale_id: config.record.id
 				}
 			}]
@@ -346,7 +359,7 @@ Ext.extend(msDiscount.window.Sale, MODx.Window, {
 		}];
 	},
 
-	loadDropZones: function() {},
+	loadDropZones: function() {}
 
 });
 Ext.reg('msd-window-sale', msDiscount.window.Sale);
@@ -524,7 +537,7 @@ Ext.extend(msDiscount.grid.SalesMemberGroup, MODx.grid.Grid, {
 		}
 
 		return ids;
-	},
+	}
 
 });
 Ext.reg('msd-grid-sales-group', msDiscount.grid.SalesMemberGroup);

@@ -3,7 +3,7 @@ msDiscount.page.Home = function(config) {
 	Ext.applyIf(config, {
 		components: [{
 			xtype: 'msd-panel-home',
-			renderTo: 'msd-panel-home-div',
+			renderTo: 'msd-panel-home-div'
 		}]
 	});
 	msDiscount.page.Home.superclass.constructor.call(this, config);
@@ -38,10 +38,10 @@ msDiscount.panel.Home = function(config) {
 				items: [{
 					html: '<p>' + _('msd_sales_desc') + '</p>',
 					border: false,
-					bodyCssClass: 'panel-desc',
+					bodyCssClass: 'panel-desc'
 				},{
 					xtype: 'msd-grid-sales',
-					cls: 'main-wrapper',
+					cls: 'main-wrapper'
 				}]
 			},{
 				title: _('msd_coupons'),
@@ -62,10 +62,10 @@ msDiscount.panel.Home = function(config) {
 				items: [{
 					html: '<p>' + _('msd_users_desc') + '</p>',
 					border: false,
-					bodyCssClass: 'panel-desc',
+					bodyCssClass: 'panel-desc'
 				},{
 					xtype: 'msd-grid-users',
-					cls: 'main-wrapper',
+					cls: 'main-wrapper'
 				}]
 			},{
 				title: _('msd_products'),
@@ -74,10 +74,22 @@ msDiscount.panel.Home = function(config) {
 				items: [{
 					html: '<p>' + _('msd_products_desc') + '</p>',
 					border: false,
-					bodyCssClass: 'panel-desc',
+					bodyCssClass: 'panel-desc'
 				},{
 					xtype: 'msd-grid-products',
-					cls: 'main-wrapper',
+					cls: 'main-wrapper'
+				}]
+			},{
+				title: _('msd_product_vendors'),
+				layout: 'anchor',
+				deferredRender: true,
+				items: [{
+					html: '<p>' + _('msd_product_vendors_desc') + '</p>',
+					border: false,
+					bodyCssClass: 'panel-desc'
+				},{
+					xtype: 'msd-grid-vendors',
+					cls: 'main-wrapper'
 				}]
 			},{
 				title: _('msd_check'),
@@ -86,10 +98,10 @@ msDiscount.panel.Home = function(config) {
 				items: [{
 					html: '<p>' + _('msd_check_desc') + '</p>',
 					border: false,
-					bodyCssClass: 'panel-desc',
+					bodyCssClass: 'panel-desc'
 				},{
 					xtype: 'msd-form-check',
-					cls: 'main-wrapper',
+					cls: 'main-wrapper'
 				}]
 			}]
 		}]

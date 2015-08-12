@@ -3,6 +3,29 @@
 $settings = array();
 
 $tmp = array(
+
+
+	//временные
+/*
+			'assets_path' => array(
+				'xtype' => 'textfield',
+				'value' => '{base_path}msdiscount/assets/components/msdiscount/',
+				'area' => 'msdiscount_temp',
+			),
+			'assets_url' => array(
+				'xtype' => 'textfield',
+				'value' => '/msdiscount/assets/components/msdiscount/',
+				'area' => 'msdiscount_temp',
+			),
+			'core_path' => array(
+				'xtype' => 'textfield',
+				'value' => '{base_path}msdiscount/core/components/msdiscount/',
+				'area' => 'msdiscount_temp',
+			),*/
+
+
+	//временные
+
 	/*
 	'some_setting' => array(
 		'xtype' => 'combo-boolean',
@@ -18,7 +41,7 @@ foreach ($tmp as $k => $v) {
 	$setting->fromArray(array_merge(
 		array(
 			'key' => 'msdiscount_'.$k,
-			'namespace' => PKG_NAME_LOWER.':default',
+			'namespace' => PKG_NAME_LOWER,
 		), $v
 	),'',true,true);
 
@@ -27,3 +50,5 @@ foreach ($tmp as $k => $v) {
 
 unset($tmp);
 return $settings;
+
+

@@ -107,6 +107,8 @@ class msDiscount {
 		$this->debugMessage('msd_dbg_get_users', array('user_id' => $user_id, 'count' => count($users)));
 		$products = $this->getProductGroups($product_id);
 		$this->debugMessage('msd_dbg_get_products', array('product_id' => $product_id, 'count' => count($products)));
+		$vendors = $this->getProductVendors($product_id);
+		$this->debugMessage('msd_dbg_get_vendors', array('product_id' => $product_id, 'count' => count($vendors)));
 		if (empty($date)) {$date = date('Y-m-d H:i:s');}
 		$sales = $this->getSales($date);
 		$this->debugMessage('msd_dbg_get_sales', array('count' => count($sales)));
@@ -121,7 +123,7 @@ class msDiscount {
 				$exclude = false;
 				// Exclude groups if so specified in sale
 				// And convert relation to discount
-				foreach (array('users','products') as $type) {
+				foreach (array('users','products','vendors') as $type) {
 					foreach ($sale[$type] as $group_id => $relation) {
 						if ($relation != 'in') {
 							unset($sale[$type][$group_id]);
@@ -139,25 +141,26 @@ class msDiscount {
 				if ($exclude) {continue;}
 				$users_in = array_intersect(array_keys($sale['users']), array_keys($users));
 				$products_in = array_intersect(array_keys($sale['products']), array_keys($products));
+				$vendors_in = array_intersect(array_keys($sale['vendors']), array_keys($vendors));
 
-				if (empty($sale['users']) && empty($sale['products'])) {
+				if (empty($sale['users']) && empty($sale['products']) && empty($sale['vendors'])) {
 					$discount = $sale['discount'];
 					$this->debugMessage('msd_dbg_sale_all', array('name' => $sale['name']));
 					$this->discount($discount, 'msd_dbg_sale_group_both', array('name' => $sale['name'], 'discount' => $discount));
 					// Check group discount
-					foreach (array('users', 'products') as $type) {
+					foreach (array('users', 'products','vendors') as $type) {
 						foreach (${$type} as $group_id => $discount) {
 							$this->discount($discount, 'msd_dbg_sale_personal_'.$type, array('group_id' => $group_id, 'discount' => $discount));
 						}
 					}
 				}
 				else {
-					if (!empty($sale['users']) && !empty($sale['products'])) {
-						if (!empty($users_in) && !empty($products_in)) {
+					if (!empty($sale['users']) && !empty($sale['products']) && !empty($sale['vendors'])) {
+						if (!empty($users_in) && !empty($products_in) && !empty($vendors_in)) {
 							$discount = $sale['discount'];
 							$this->discount($discount, 'msd_dbg_sale_group_both', array('name' => $sale['name'], 'discount' => $discount));
 							// Check group discounts
-							foreach (array('users', 'products') as $type) {
+							foreach (array('users', 'products', 'vendors') as $type) {
 								foreach ($sale[$type] as $group_id => $discount) {
 									$this->discount($discount, 'msd_dbg_sale_personal_'.$type, array('group_id' => $group_id, 'discount' => $discount));
 								}
@@ -184,6 +187,16 @@ class msDiscount {
 							$this->discount($discount, 'msd_dbg_sale_personal_products', array('group_id' => $group_id, 'discount' => $discount));
 						}
 					}
+
+					elseif (!empty($sale['vendors']) && !empty($vendors_in)) {
+						$discount = $sale['discount'];
+						$this->discount($discount, 'msd_dbg_sale_group_vendors', array('name' => $sale['name'], 'discount' => $discount));
+						// Check group discounts
+						foreach ($sale['vendors'] as $group_id => $discount) {
+							$this->discount($discount, 'msd_dbg_sale_personal_vendors', array('group_id' => $group_id, 'discount' => $discount));
+						}
+					}
+
 					else {
 						$this->debugMessage('msd_dbg_sale_group_no', array('name' => $sale['name']));
 						continue;
@@ -194,7 +207,7 @@ class msDiscount {
 		}
 		else {
 			// Check group discounts
-			foreach (array('users', 'products') as $type) {
+			foreach (array('users', 'products', 'vendors') as $type) {
 				foreach (${$type} as $group_id => $discount) {
 					$this->discount($discount, 'msd_dbg_personal_'.$type, array('group_id' => $group_id, 'discount' => $discount));
 				}
@@ -405,6 +418,38 @@ class msDiscount {
 		return $groups;
 	}
 
+	/**
+	 * Return array with groups of product
+	 *
+	 * @param $id
+	 *
+	 * @return array
+	 */
+	public function getProductVendors($id) {
+		if (isset($this->cache['vendor'][$id])) {
+			return $this->cache['vendor'][$id];
+		}
+		$vendors = array();
+		if ($product = $this->modx->getObject('msProductData', $id)) {
+			if ($vendor = $product->getOne('Vendor')) {
+				$id = $vendor->get('id');
+
+				$q = $this->modx->newQuery('msdProductVendorsGroup', $id);
+				$q->select('discount');
+				$tstart = microtime(true);
+				if ($q->prepare() && $q->stmt->execute()) {
+					$this->modx->queryTime += microtime(true) - $tstart;
+					$this->modx->executedQueries++;
+					while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+						$vendors[$id] = $row['discount'];
+					}
+				}
+			}
+		}
+
+		$this->cache['vendor'][$id] = $vendors;
+		return $vendors;
+	}
 
 	/**
 	 * Return array with current active sales
@@ -461,6 +506,7 @@ class msDiscount {
 						'ends' => $row['ends'],
 						'users' => array(),
 						'products' => array(),
+						'vendors' => array(),
 					);
 				}
 				if (!empty($row['type']) && !empty($row['group_id'])) {

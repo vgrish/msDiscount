@@ -1,5 +1,9 @@
 Changelog for msDiscount.
 
+1.1.4-beta
+==============
+- Add vendor discount
+
 1.1.3-pl
 ==============
 - Completely rewritten snippet "msdBuyNow".

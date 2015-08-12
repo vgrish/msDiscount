@@ -7,7 +7,7 @@ class msdSaleGroupGetListProcessor extends modObjectGetListProcessor {
 	public $classKey = '';
 	public $linkedKey = '';
 	public $defaultSortField = 'name';
-	public $defaultSortDirection = 'DESC';
+	public $defaultSortDirection = 'ASC';
 	public $renderers = '';
 
 
@@ -20,6 +20,10 @@ class msdSaleGroupGetListProcessor extends modObjectGetListProcessor {
 			case 'products':
 				$this->objectType = $this->classKey = 'modResourceGroup';
 				$this->linkedKey = 'msdProductGroup';
+				break;
+			case 'vendors':
+				$this->objectType = $this->classKey = 'msVendor';
+				$this->linkedKey = 'msdProductVendorsGroup';
 				break;
 		}
 
@@ -47,6 +51,14 @@ class msdSaleGroupGetListProcessor extends modObjectGetListProcessor {
     	$c->select($this->modx->getSelectColumns($this->linkedKey, $this->linkedKey));
     	$c->select($this->modx->getSelectColumns($this->classKey, $this->classKey));
     	$c->where(array('msdSaleMember.sale_id' => null));
+
+		$query = $this->getProperty('query');
+		if(!empty($query)) {
+			$c->andCondition(array(
+				'name:LIKE' => '%'.$query.'%',
+			));
+		}
+
     	return $c;
 	}
 

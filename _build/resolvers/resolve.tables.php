@@ -18,6 +18,7 @@ if ($object->xpdo) {
 				'msdSale',
 				'msdUserGroup',
 				'msdProductGroup',
+				'msdProductVendorsGroup',
 				'msdSaleMember',
 				'msdCouponGroup',
 				'msdCoupon',

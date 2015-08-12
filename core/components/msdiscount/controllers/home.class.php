@@ -37,6 +37,7 @@ class msDiscountHomeManagerController extends msDiscountMainController {
 		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/misc/utils.js');
 		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/usergroups.grid.js');
 		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/productgroups.grid.js');
+		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/vendorgroups.grid.js');
 		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/sales.grid.js');
 		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/coupons.grid.js');
 		$this->addJavascript($this->msDiscount->config['jsUrl'] . 'mgr/widgets/check.form.js');

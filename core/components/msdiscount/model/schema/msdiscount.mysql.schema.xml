@@ -84,6 +84,16 @@
 		</composite>
 	</object>
 
+	<object class="msdProductVendorsGroup" table="ms2d_product_vendors_groups" extends="xPDOSimpleObject">
+		<field key="discount" dbtype="varchar" precision="10" phptype="string" null="true" default="0" />
+
+		<composite alias="Members" class="msdSaleMember" local="id" foreign="group_id" owner="local" cardinality="many">
+			<criteria target="foreign"><![CDATA[
+			{"type":"vendors"}
+			]]></criteria>
+		</composite>
+	</object>
+
 
 	<object class="msdSaleMember" table="ms2d_sale_members" extends="xPDOObject">
 		<field key="sale_id" dbtype="integer" precision="10" attributes="unsigned" phptype="integer" null="false" index="pk" />
