@@ -16,7 +16,6 @@ if (!empty($frontend_js)) {
 $date = date('Y-m-d H:i:s');
 $pdoTools->setStore('msd_date', $date);
 $usergroups = array_keys($msDiscount->getUserGroups($modx->user->id));
-$vendorgroups = $msDiscount->getProductVendors($product_id);
 $sales = $msDiscount->getSales($date, true);
 if (!empty($sale)) {
 	$pdoTools->setStore('msd_sale', $sale);
