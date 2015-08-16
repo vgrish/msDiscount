@@ -24,8 +24,7 @@ if (!empty($row) && is_array($row)) {
 	if (!empty($row['id'])) {
 		$id = $row['id'];
 	}
-}
-else {
+} else {
 	$mode = 'standalone';
 	if (!empty($frontend_css)) {
 		$frontend_css = str_replace('[[+assetsUrl]]', $msDiscount->config['assetsUrl'], $frontend_css);
@@ -67,13 +66,23 @@ if (!empty($id) && !empty($sales)) {
 				if ($type == 'out') {
 					$groups_out[] = $gid;
 					unset($sale['products'][$gid]);
-				}
-				else {
+				} else {
 					$groups_in[] = $gid;
 				}
 			}
 		}
-
+		// Check product vendors groups
+		if (!empty($sale['vendors'])) {
+			$vendors_in = $vendors_out = array();
+			foreach ($sale['vendors'] as $gid => $type) {
+				if ($type == 'out') {
+					$vendors_out[] = $gid;
+					unset($sale['vendors'][$gid]);
+				} else {
+					$vendors_in[] = $gid;
+				}
+			}
+		}
 		if (!empty($groups_out) || !empty($groups_in)) {
 			$ids = $modx->getParentIds($id);
 			$ids[] = $id;
@@ -100,10 +109,9 @@ if (!empty($id) && !empty($sales)) {
 				$modx->queryTime += microtime(true) - $tstart;
 				$modx->executedQueries++;
 				$groups = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
-				if (!empty($groups_out) && array_intersect($groups_out, $groups)) {
+				if ((!empty($groups_out) && array_intersect($groups_out, $groups)) && (empty($vendors_out) && empty($vendors_in))) {
 					continue;
-				}
-				elseif (!empty($groups_in) && !array_intersect($groups_in, $groups)) {
+				} elseif ((!empty($groups_in) && !array_intersect($groups_in, $groups) && (empty($vendors_out) && empty($vendors_in)))) {
 					continue;
 				}
 			}
@@ -118,14 +126,12 @@ if (!empty($id) && !empty($sales)) {
 				$discount = $sale['discount'];
 				$remains = $tmp_remains;
 			}
-		}
-		elseif (is_numeric($sale['discount']) && is_numeric($discount)) {
+		} elseif (is_numeric($sale['discount']) && is_numeric($discount)) {
 			if ($sale['discount'] > $discount) {
 				$discount = $sale['discount'];
 				$remains = $tmp_remains;
 			}
-		}
-		else {
+		} else {
 			$discount = $sale['discount'];
 			$remains = $tmp_remains;
 		}
@@ -136,14 +142,14 @@ $arr = array(
 	'sale_discount' => $discount,
 	'remains' => $remains,
 );
+
 if ($mode == 'standalone') {
 	$pdoTools->config['nestedChunkPrefix'] = 'minishop2_';
 
 	return !empty($tpl)
 		? $pdoTools->getChunk($tpl, $arr)
 		: print_r($arr, true);
-}
-else {
+} else {
 	$row = array_merge($row, $arr);
 
 	return $modx->toJSON($row);

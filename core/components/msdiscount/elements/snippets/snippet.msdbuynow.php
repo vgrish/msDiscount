@@ -32,7 +32,7 @@ if (empty($sales)) {
 		: '';
 }
 $all = false;
-$parents_in = $parents_out = $vendors_in = $vendors_out = array();
+$parents_in = $parents_out = $vendors_in = $vendors_out = $vendors_ids = array();
 foreach ($sales as $idx => $sale) {
 	// Check user groups
 	if (!empty($sale['users'])) {
@@ -58,13 +58,12 @@ foreach ($sales as $idx => $sale) {
 			$c->select('document');
 			$tstart = microtime(true);
 			if ($c->prepare() && $c->stmt->execute()) {
-				$this->modx->queryTime += microtime(true) - $tstart;
-				$this->modx->executedQueries++;
+				$modx->queryTime += microtime(true) - $tstart;
+				$modx->executedQueries++;
 				if ($ids = $c->stmt->fetchAll(PDO::FETCH_COLUMN)) {
 					if ($type == 'in') {
 						$parents_in = array_merge($parents_in, $ids);
-					}
-					else {
+					} else {
 						$parents_out = array_merge($parents_out, $ids);
 					}
 				}
@@ -74,24 +73,13 @@ foreach ($sales as $idx => $sale) {
 	// Check vendors groups
 	if (!empty($sale['vendors'])) {
 		foreach ($sale['vendors'] as $gid => $type) {
-			$c = $modx->newQuery('msProductData', array('vendor' => $gid));
-			$c->select('id');
-			$tstart = microtime(true);
-			if ($c->prepare() && $c->stmt->execute()) {
-				$this->modx->queryTime += microtime(true) - $tstart;
-				$this->modx->executedQueries++;
-				if ($ids = $c->stmt->fetchAll(PDO::FETCH_COLUMN)) {
-					if ($type == 'in') {
-						$vendors_in = array_merge($parents_in, $ids);
-					}
-					else {
-						$vendors_out = array_merge($parents_out, $ids);
-					}
-				}
+			if ($type == 'in') {
+				$vendors_in[] = $gid;
+			} else {
+				$vendors_out[] = $gid;
 			}
 		}
-	}
-	// All products
+	} // All products
 	else {
 		$all = true;
 		break;
@@ -113,9 +101,38 @@ if (!empty($scriptProperties['where'])) {
 	$where = !is_array($scriptProperties['where'])
 		? $modx->fromJSON($scriptProperties['where'])
 		: $scriptProperties['where'];
-}
-else {
+} else {
 	$where = array();
+}
+if (!empty($vendors_in)) {
+	$c = $modx->newQuery('msProductData');
+	$c->where(array(
+		'vendor:IN' => $vendors_in,
+	));
+	$c->select('id');
+	$tstart = microtime(true);
+	if ($c->prepare() && $c->stmt->execute()) {
+		$modx->queryTime += microtime(true) - $tstart;
+		$modx->executedQueries++;
+		if ($ids = $c->stmt->fetchAll(PDO::FETCH_COLUMN)) {
+			$parents_in = array_merge($parents_in, $ids);
+		}
+	}
+}
+if (!empty($vendors_out)) {
+	$c = $modx->newQuery('msProductData');
+	$c->where(array(
+		'sale_id:NOT IN' => $vendors_out,
+	));
+	$c->select('id');
+	$tstart = microtime(true);
+	if ($c->prepare() && $c->stmt->execute()) {
+		$modx->queryTime += microtime(true) - $tstart;
+		$modx->executedQueries++;
+		if ($ids = $c->stmt->fetchAll(PDO::FETCH_COLUMN)) {
+			$parents_out = array_merge($parents_out, $ids);
+		}
+	}
 }
 if (!$all) {
 	$depth = (isset($config['depth']) && $config['depth'] !== '')
@@ -127,8 +144,8 @@ if (!$all) {
 		$q->select('id,context_key');
 		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
-			$this->modx->queryTime += microtime(true) - $tstart;
-			$this->modx->executedQueries++;
+			$modx->queryTime += microtime(true) - $tstart;
+			$modx->executedQueries++;
 			while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
 				$pids[$row['id']] = $row['context_key'];
 			}
@@ -136,11 +153,9 @@ if (!$all) {
 		foreach ($pids as $k => $v) {
 			if (!is_numeric($k)) {
 				continue;
-			}
-			elseif (in_array($k, $parents_in)) {
+			} elseif (in_array($k, $parents_in)) {
 				$parents_in = array_merge($parents_in, $modx->getChildIds($k, $depth, array('context' => $v)));
-			}
-			else {
+			} else {
 				$parents_out = array_merge($parents_out, $modx->getChildIds($k, $depth, array('context' => $v)));
 			}
 		}
@@ -160,21 +175,10 @@ if (!$all) {
 			$q->select('product_id');
 			$tstart = microtime(true);
 			if ($q->prepare() && $q->stmt->execute()) {
-				$this->modx->queryTime += microtime(true) - $tstart;
-				$this->modx->executedQueries++;
+				$modx->queryTime += microtime(true) - $tstart;
+				$modx->executedQueries++;
 				$members = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
 			}
-		}
-		// Add product to conditions
-		if (!empty($vendors_in)) {
-			$where[] = array(
-				'id:IN' => $vendors_in,
-			);
-		}
-		if (!empty($vendors_out)) {
-			$where[] = array(
-				'id:NOT IN' => $vendors_out,
-			);
 		}
 		// Add parent to conditions
 		if (!empty($parents_in) && !empty($members)) {
@@ -183,8 +187,7 @@ if (!$all) {
 				'parent:IN' => $parents_in,
 				'OR:id:IN' => $members,
 			);
-		}
-		elseif (!empty($parents_in)) {
+		} elseif (!empty($parents_in)) {
 			$where[] = array(
 				'parent:IN' => $parents_in,
 				'OR:id:IN' => $parents_in,
@@ -198,6 +201,8 @@ if (!$all) {
 		}
 	}
 }
+//echo "<pre>";print_r($where);
+//$scriptProperties['showLog'] = 1;
 $scriptProperties['where'] = $modx->toJSON($where);
 
 return $modx->runSnippet('msProducts', $scriptProperties);
