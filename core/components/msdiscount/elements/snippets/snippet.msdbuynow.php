@@ -16,6 +16,7 @@ if (!empty($frontend_js)) {
 $date = date('Y-m-d H:i:s');
 $pdoTools->setStore('msd_date', $date);
 $usergroups = array_keys($msDiscount->getUserGroups($modx->user->id));
+$vendorgroups = $msDiscount->getProductVendors($product_id);
 $sales = $msDiscount->getSales($date, true);
 if (!empty($sale)) {
 	$pdoTools->setStore('msd_sale', $sale);
@@ -32,8 +33,7 @@ if (empty($sales)) {
 		: '';
 }
 $all = false;
-$parents_in = array();
-$parents_out = array();
+$parents_in = $parents_out = $vendors_in = $vendors_out = array();
 foreach ($sales as $idx => $sale) {
 	// Check user groups
 	if (!empty($sale['users'])) {
@@ -72,6 +72,26 @@ foreach ($sales as $idx => $sale) {
 			}
 		}
 	}
+	// Check vendors groups
+	if (!empty($sale['vendors'])) {
+		foreach ($sale['vendors'] as $gid => $type) {
+			$c = $modx->newQuery('msProductData', array('vendor' => $gid));
+			$c->select('id');
+			$tstart = microtime(true);
+			if ($c->prepare() && $c->stmt->execute()) {
+				$this->modx->queryTime += microtime(true) - $tstart;
+				$this->modx->executedQueries++;
+				if ($ids = $c->stmt->fetchAll(PDO::FETCH_COLUMN)) {
+					if ($type == 'in') {
+						$vendors_in = array_merge($parents_in, $ids);
+					}
+					else {
+						$vendors_out = array_merge($parents_out, $ids);
+					}
+				}
+			}
+		}
+	}
 	// All products
 	else {
 		$all = true;
@@ -79,14 +99,14 @@ foreach ($sales as $idx => $sale) {
 	}
 }
 
-if (!$parents_in && !$parents_out && !$all) {
+if (!$parents_in && !$parents_out && !$vendors_in && !$vendors_out && !$all) {
 	return !empty($showLog) && $modx->user->hasSessionContext('mgr')
 		? $modx->lexicon('msd_err_no_sales')
 		: '';
 }
 
 if (empty($scriptProperties['prepareSnippet'])) {
-	$scriptProperties['prepareSnippet'] = 'msdGetDiscount';
+	$scriptProperties['prepareSnippet'] = '_msdGetDiscount';
 }
 
 $scriptProperties['parents'] = 0;
@@ -145,6 +165,17 @@ if (!$all) {
 				$this->modx->executedQueries++;
 				$members = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
 			}
+		}
+		// Add product to conditions
+		if (!empty($vendors_in)) {
+			$where[] = array(
+				'id:IN' => $vendors_in,
+			);
+		}
+		if (!empty($vendors_out)) {
+			$where[] = array(
+				'id:NOT IN' => $vendors_out,
+			);
 		}
 		// Add parent to conditions
 		if (!empty($parents_in) && !empty($members)) {
