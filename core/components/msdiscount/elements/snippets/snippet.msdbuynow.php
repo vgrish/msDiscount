@@ -105,7 +105,7 @@ if (!$parents_in && !$parents_out && !$vendors_in && !$vendors_out && !$all) {
 }
 
 if (empty($scriptProperties['prepareSnippet'])) {
-	$scriptProperties['prepareSnippet'] = '_msdGetDiscount';
+	$scriptProperties['prepareSnippet'] = 'msdGetDiscount';
 }
 
 $scriptProperties['parents'] = 0;
