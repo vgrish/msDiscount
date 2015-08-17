@@ -8,6 +8,7 @@ $xpdo_meta_map = array (
     2 => 'msdCoupon',
     3 => 'msdUserGroup',
     4 => 'msdProductGroup',
+    5 => 'msdProductVendorsGroup',
   ),
   'xPDOObject' => 
   array (

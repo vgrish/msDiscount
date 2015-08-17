@@ -431,25 +431,22 @@ class msDiscount {
 		}
 		$vendors = array();
 		if ($product = $this->modx->getObject('msProductData', $id)) {
-			if ($vendor = $product->getOne('Vendor')) {
-				$id = $vendor->get('id');
-
-				$q = $this->modx->newQuery('msdProductVendorsGroup', $id);
-				$q->select('discount');
-				$tstart = microtime(true);
-				if ($q->prepare() && $q->stmt->execute()) {
-					$this->modx->queryTime += microtime(true) - $tstart;
-					$this->modx->executedQueries++;
-					while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
-						$vendors[$id] = $row['discount'];
-					}
+			$vendor = $product->get('vendor');
+			$q = $this->modx->newQuery('msdProductVendorsGroup', $vendor);
+			$q->select('discount');
+			$tstart = microtime(true);
+			if ($q->prepare() && $q->stmt->execute()) {
+				$this->modx->queryTime += microtime(true) - $tstart;
+				$this->modx->executedQueries++;
+				while ($row = $q->stmt->fetch(PDO::FETCH_ASSOC)) {
+					$vendors[$vendor] = $row['discount'];
 				}
 			}
 		}
-
 		$this->cache['vendor'][$id] = $vendors;
 		return $vendors;
 	}
+
 
 	/**
 	 * Return array with current active sales
