@@ -122,7 +122,7 @@ if (!empty($vendors_in)) {
 if (!empty($vendors_out)) {
 	$c = $modx->newQuery('msProductData');
 	$c->where(array(
-		'sale_id:NOT IN' => $vendors_out,
+		'vendor:IN' => $vendors_out,
 	));
 	$c->select('id');
 	$tstart = microtime(true);
