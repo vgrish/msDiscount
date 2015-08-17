@@ -201,7 +201,6 @@ if (!$all) {
 		}
 	}
 }
-//echo "<pre>";print_r($where);
 //$scriptProperties['showLog'] = 1;
 $scriptProperties['where'] = $modx->toJSON($where);
 
