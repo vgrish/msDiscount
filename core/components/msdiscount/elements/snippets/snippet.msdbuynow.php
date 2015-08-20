@@ -32,7 +32,7 @@ if (empty($sales)) {
 		: '';
 }
 $all = false;
-$parents_in = $parents_out = $vendors_in = $vendors_out = $vendors_ids = array();
+$parents_in = $parents_out = $vendors_in = $vendors_out = array();
 foreach ($sales as $idx => $sale) {
 	// Check user groups
 	if (!empty($sale['users'])) {
@@ -80,12 +80,11 @@ foreach ($sales as $idx => $sale) {
 			}
 		}
 	} // All products
-	else {
+	if (empty($sale['users']) && empty($sale['products']) && empty($sale['vendors'])) {
 		$all = true;
 		break;
 	}
 }
-
 if (!$parents_in && !$parents_out && !$vendors_in && !$vendors_out && !$all) {
 	return !empty($showLog) && $modx->user->hasSessionContext('mgr')
 		? $modx->lexicon('msd_err_no_sales')
@@ -140,7 +139,7 @@ if (!$all) {
 		: 10;
 	if (!empty($depth) && $depth > 0) {
 		$pids = array();
-		$q = $modx->newQuery($class, array('id:IN' => array_merge($parents_in, $parents_out)));
+		$q = $modx->newQuery('modResource', array('id:IN' => array_merge($parents_in, $parents_out)));
 		$q->select('id,context_key');
 		$tstart = microtime(true);
 		if ($q->prepare() && $q->stmt->execute()) {
