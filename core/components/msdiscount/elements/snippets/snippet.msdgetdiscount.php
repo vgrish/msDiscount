@@ -38,7 +38,7 @@ if (!empty($row) && is_array($row)) {
 		$id = $modx->resource->id;
 	}
 }
-
+$vendorsgroups = array_keys($msDiscount->getProductVendors($id));
 $remains = $discount = 0;
 if (!empty($id) && !empty($sales)) {
 	foreach ($sales as $sale) {
@@ -116,14 +116,22 @@ if (!empty($id) && !empty($sales)) {
 				}
 			}
 		}
-
+		if (!empty($vendors_in) || !empty($vendors_out)) {
+			if ((!empty($vendors_out) && array_intersect($vendors_out, $vendorsgroups))) {
+				continue;
+			} elseif ((!empty($vendors_in) && !array_intersect($vendors_in, $vendorsgroups))) {
+				continue;
+			}
+		}
 		// Product match
 		$tmp_remains = ($sale['ends'] != '0000-00-00 00:00:00')
 			? strtotime($sale['ends']) - time()
 			: 0;
 		if (strpos($sale['discount'], '%') !== false && (empty($discount) || strpos($discount, '%') !== false)) {
+			$sale['discount'] = str_replace('%', '', $sale['discount']);
+			$discount = str_replace('%', '', $discount);
 			if ($sale['discount'] > $discount) {
-				$discount = $sale['discount'];
+				$discount = $sale['discount'] . '%';
 				$remains = $tmp_remains;
 			}
 		} elseif (is_numeric($sale['discount']) && is_numeric($discount)) {
@@ -142,7 +150,6 @@ $arr = array(
 	'sale_discount' => $discount,
 	'remains' => $remains,
 );
-
 if ($mode == 'standalone') {
 	$pdoTools->config['nestedChunkPrefix'] = 'minishop2_';
 
